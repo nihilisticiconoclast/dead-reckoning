@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Dead Reckoning — a forecasting log</title>
+  <meta name="description" content="Probabilistic forecasts, pre-registered by commit and scored with proper scoring rules.">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <!-- the LOCKED Tunnel identity (palette, type, hard edges) — linked, never inlined -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/nihilisticiconoclast/cuddly-lamp@main/assets/tokens.css">
+  <link rel="stylesheet" href="./app.css">
+</head>
+<body data-seed="dead-reckoning">
+
+  <header class="masthead dr-wrap">
+    <div class="brand">
+      <!-- the FIXED house mark / logo (same on every Tunnel page) -->
+      <span class="sig" id="sig"></span>
+      <span class="wordmark">Dead Reckoning<br>Forecast log</span>
+    </div>
+    <nav><a href="https://github.com/nihilisticiconoclast/dead-reckoning">Repo</a></nav>
+  </header>
+
+  <section class="hero dr-wrap">
+    <p class="eyebrow">A personal forecasting log</p>
+    <h1>Dead Reckoning</h1>
+    <p class="lede thesis">Set a probability before the outcome is known; let it resolve; score it
+      honestly. The commit timestamp is the proof the forecast came first — a course
+      committed before the fix.</p>
+  </section>
+
+  <!-- the per-page doodle: seeded contour scribble with the red route, dropped into a
+       random edge slot by placeDoodle — off-centre, behind the content, never boxed -->
+  <div class="doodle" id="doodle"></div>
+
+  <main id="app">
+    <section class="panel"><p class="mono dim">Loading the ledger…</p></section>
+  </main>
+
+  <!-- the seeded signature generator, linked from the cuddly-lamp CDN -->
+  <script src="https://cdn.jsdelivr.net/gh/nihilisticiconoclast/cuddly-lamp@main/assets/tunnel-figure.js"></script>
+  <script src="./app.js"></script>
+  <script>
+    // masthead logo: the fixed 'mark' — same house mark on every page (seed ignored)
+    document.getElementById('sig').innerHTML =
+      TunnelFigure.tunnelFigureSVG(null, { variant: 'mark' });
+    // per-page doodle: seeded from this page, so it is unique here but stable on reload
+    var seed = document.body.dataset.seed || location.pathname || document.title;
+    document.getElementById('doodle').innerHTML =
+      TunnelFigure.tunnelFigureSVG(seed, { variant: 'doodle' });
+    TunnelFigure.placeDoodle(document.getElementById('doodle'));   // random edge slot
+  </script>
+</body>
+</html>
