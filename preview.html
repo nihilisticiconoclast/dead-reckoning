@@ -1,0 +1,1144 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dead Reckoning — a forecasting log</title>
+<meta name="description" content="Probabilistic forecasts, pre-registered by commit and scored with proper scoring rules.">
+<style>
+/* Dead Reckoning — Tunnel tokens
+   Cartography × phase-space. Parchment ink on a deep phase-space ground; a warm
+   route (you) and a cool route (the model). Stand-in for your own tokens.css —
+   the variable names are the contract, the values are yours to replace. */
+
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+
+:root {
+  /* ground + structure */
+  --ground:        #0c0f14;
+  --ground-raised: #141a23;
+  --ground-sunk:   #090b0f;
+  --contour:       rgba(143, 162, 184, 0.10);
+  --contour-bold:  rgba(143, 162, 184, 0.18);
+  --hairline:      rgba(143, 162, 184, 0.16);
+
+  /* ink */
+  --ink:      #e9e3d4;   /* parchment, primary text */
+  --ink-dim:  #93a0ae;   /* muted slate */
+  --ink-faint:#5f6b78;
+
+  /* routes */
+  --route-you:   #e0954a;   /* sienna — your committed line */
+  --route-model: #4fb6a8;   /* teal — the model */
+  --route-you-soft:   rgba(224, 149, 74, 0.16);
+  --route-model-soft: rgba(79, 182, 168, 0.16);
+
+  /* outcomes */
+  --yes: #79b07a;
+  --no:  #c8635a;
+
+  /* type */
+  --display: 'Fraunces', Georgia, 'Times New Roman', serif;
+  --body:    -apple-system, BlinkMacSystemFont, 'Segoe UI', Inter, system-ui, sans-serif;
+  --mono:    'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  /* type scale */
+  --t-hero:   clamp(2.6rem, 7vw, 4.6rem);
+  --t-h2:     1.05rem;
+  --t-body:   0.95rem;
+  --t-small:  0.8rem;
+  --t-micro:  0.68rem;
+
+  /* space + form */
+  --gap:    1.5rem;
+  --pad:    1.35rem;
+  --radius: 4px;
+  --maxw:   1080px;
+}
+
+* { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  background: var(--ground);
+  color: var(--ink);
+  font-family: var(--body);
+  font-size: var(--t-body);
+  line-height: 1.55;
+  letter-spacing: 0.01em;
+  -webkit-font-smoothing: antialiased;
+}
+
+.wrap { max-width: var(--maxw); margin: 0 auto; padding: 0 1.25rem; }
+
+/* eyebrow / chart labels */
+.eyebrow {
+  font-family: var(--mono);
+  font-size: var(--t-micro);
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  margin: 0 0 0.6rem;
+}
+
+h2.section {
+  font-family: var(--display);
+  font-weight: 500;
+  font-size: 1.6rem;
+  letter-spacing: -0.01em;
+  margin: 0 0 1.1rem;
+  color: var(--ink);
+}
+
+.mono { font-family: var(--mono); }
+.dim  { color: var(--ink-dim); }
+.faint{ color: var(--ink-faint); }
+
+a { color: var(--route-you); text-decoration: none; }
+a:hover { text-decoration: underline; text-underline-offset: 3px; }
+
+/* panels */
+.panel {
+  background: var(--ground-raised);
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius);
+  padding: var(--pad);
+}
+
+/* a thin contour rule */
+.rule { height: 1px; background: var(--hairline); border: 0; margin: 0; }
+
+:focus-visible { outline: 2px solid var(--route-you); outline-offset: 2px; }
+
+@media (prefers-reduced-motion: reduce) {
+  * { animation: none !important; transition: none !important; }
+}
+
+/* Dead Reckoning — page layout. Uses the variables from tokens.css. */
+
+/* hero ---------------------------------------------------------------------- */
+.hero {
+  position: relative;
+  height: clamp(300px, 46vh, 420px);
+  border-bottom: 1px solid var(--hairline);
+  background: var(--ground-sunk);
+  overflow: hidden;
+}
+.hero canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.hero-overlay {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column; justify-content: flex-end;
+  max-width: var(--maxw); margin: 0 auto; padding: 0 1.25rem 2rem;
+  background: linear-gradient(to bottom, transparent 40%, rgba(9,11,15,.55) 100%);
+}
+.hero h1 {
+  font-family: var(--display);
+  font-weight: 600;
+  font-size: var(--t-hero);
+  line-height: 0.96;
+  letter-spacing: -0.02em;
+  margin: 0.2rem 0 0.5rem;
+  color: var(--ink);
+}
+.hero .coords { color: var(--route-you); }
+.hero .thesis {
+  max-width: 40rem; margin: 0; color: var(--ink-dim);
+  font-size: clamp(0.95rem, 1.6vw, 1.1rem);
+}
+
+/* spacing ------------------------------------------------------------------- */
+main#app { display: block; }
+main#app > section { max-width: var(--maxw); margin: 0 auto; padding: 2.6rem 1.25rem 0; }
+main#app > .rule { max-width: var(--maxw); margin: 2.6rem auto 0; }
+main#app > footer { max-width: var(--maxw); margin: 0 auto; padding: 1.4rem 1.25rem 3rem; }
+
+/* scoreboard ---------------------------------------------------------------- */
+.standing {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr 1.2fr;
+  align-items: center; gap: var(--gap);
+  padding-top: 2.6rem;
+}
+.score-card { background: var(--ground-raised); border: 1px solid var(--hairline);
+  border-radius: var(--radius); padding: 1.1rem 1.2rem; }
+.score-brier { font-size: 2.7rem; line-height: 1; margin-top: 0.5rem; }
+.score-sub { font-size: var(--t-micro); margin-top: 0.25rem; }
+.score-row { display: flex; gap: 1.2rem; margin-top: 0.9rem; font-size: var(--t-small); }
+.versus { font-size: var(--t-small); text-align: center; }
+.score-meta { padding-left: 0.4rem; font-size: var(--t-small); line-height: 1.9; }
+.score-meta .figure { font-size: 1.05rem; color: var(--ink); }
+
+/* two-column ---------------------------------------------------------------- */
+.grid-2 { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr); gap: var(--gap); align-items: start; }
+
+/* plots --------------------------------------------------------------------- */
+.plot { margin: 0; }
+.plot svg { width: 100%; height: auto; display: block; }
+.plot.wide svg { max-height: 280px; }
+figcaption { margin-top: 0.7rem; font-size: var(--t-small); }
+.ax { fill: var(--ink-faint); font-family: var(--mono); font-size: 10px; }
+.ax-t { fill: var(--ink-dim); font-family: var(--mono); font-size: 10px; letter-spacing: 0.03em; }
+
+/* readout / prose ----------------------------------------------------------- */
+.readout { padding-top: 0.4rem; }
+.lede { color: var(--ink-dim); margin: 0 0 1rem; }
+.lede .mono { color: var(--ink); }
+.key { list-style: none; padding: 0; margin: 0; display: flex; gap: 1.4rem; font-size: var(--t-small); }
+.key li { display: flex; align-items: center; gap: 0.5rem; }
+.dot { width: 11px; height: 11px; border-radius: 50%; display: inline-block; }
+
+/* decomposition ------------------------------------------------------------- */
+table.decomp { width: 100%; border-collapse: collapse; }
+table.decomp th, table.decomp td { text-align: left; padding: 0.55rem 0.6rem; border-bottom: 1px solid var(--hairline); vertical-align: middle; }
+table.decomp thead th { font-family: var(--mono); font-size: var(--t-micro); letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-faint); border-bottom-color: var(--contour-bold); }
+table.decomp tbody th { font-weight: 400; font-size: var(--t-small); color: var(--ink); }
+table.decomp td.mono { width: 4.5rem; }
+table.decomp tr.sum th, table.decomp tr.sum td { border-bottom: none; padding-top: 0.8rem; color: var(--ink); }
+.meter { display: block; width: 96px; height: 6px; background: var(--ground-sunk); border-radius: 3px; overflow: hidden; }
+.meter > span { display: block; height: 100%; }
+
+/* ledgers ------------------------------------------------------------------- */
+table.ledger { width: 100%; border-collapse: collapse; font-size: var(--t-small); }
+table.ledger th, table.ledger td { text-align: left; padding: 0.5rem 0.7rem; border-bottom: 1px solid var(--hairline); }
+table.ledger thead th { font-family: var(--mono); font-size: var(--t-micro); letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-faint); border-bottom-color: var(--contour-bold); white-space: nowrap; }
+table.ledger tbody tr:hover { background: rgba(143, 162, 184, 0.05); }
+table.ledger td.id { color: var(--ink-dim); white-space: nowrap; }
+table.ledger td.mono.lead { color: var(--route-you); }
+.cat { font-size: var(--t-micro); letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-faint); border: 1px solid var(--contour-bold); border-radius: 2px; padding: 0.05rem 0.35rem; white-space: nowrap; }
+
+/* responsive ---------------------------------------------------------------- */
+@media (max-width: 860px) {
+  .grid-2 { grid-template-columns: 1fr; }
+  .standing { grid-template-columns: 1fr 1fr; }
+  .versus { display: none; }
+  .score-meta { grid-column: 1 / -1; padding-left: 0; }
+}
+@media (max-width: 560px) {
+  .standing { grid-template-columns: 1fr; }
+  .panel { overflow-x: auto; }
+  table.ledger { min-width: 460px; }
+}
+
+</style>
+</head>
+<body>
+  <header class="hero">
+    <canvas data-tunnel data-seed="4096" aria-hidden="true"></canvas>
+    <div class="hero-overlay wrap">
+      <p class="eyebrow">A personal forecasting log</p>
+      <h1>Dead&nbsp;<span class="coords">Reckoning</span></h1>
+      <p class="thesis">Set a probability before the outcome is known; let it resolve; score it honestly.
+        The commit timestamp is the proof the forecast came first.</p>
+    </div>
+  </header>
+  <main id="app">
+    <section class="panel" style="max-width:var(--maxw);margin:2.6rem auto 0">
+      <p class="mono dim">Loading the ledger…</p>
+    </section>
+  </main>
+  <script>window.__DATA__ = {
+  "generated_at": "2026-06-22T06:00:00Z",
+  "counts": {
+    "resolved": 16,
+    "open": 4,
+    "awaiting": 1
+  },
+  "base_rate": 0.5625,
+  "forecasters": {
+    "you": {
+      "label": "You",
+      "n": 16,
+      "brier": 0.1535,
+      "logloss": 0.4732,
+      "bss": 0.3763,
+      "reliability": 0.0236,
+      "resolution": 0.1107,
+      "uncertainty": 0.2461
+    },
+    "claude": {
+      "label": "Claude",
+      "n": 16,
+      "brier": 0.1741,
+      "logloss": 0.5331,
+      "bss": 0.2925,
+      "reliability": 0.0145,
+      "resolution": 0.0711,
+      "uncertainty": 0.2461
+    }
+  },
+  "calibration": {
+    "you": [
+      {
+        "lo": 0.2,
+        "hi": 0.3,
+        "n": 1,
+        "mean_forecast": 0.2,
+        "observed": 0.0
+      },
+      {
+        "lo": 0.3,
+        "hi": 0.4,
+        "n": 2,
+        "mean_forecast": 0.325,
+        "observed": 0.0
+      },
+      {
+        "lo": 0.4,
+        "hi": 0.5,
+        "n": 2,
+        "mean_forecast": 0.425,
+        "observed": 0.5
+      },
+      {
+        "lo": 0.5,
+        "hi": 0.6,
+        "n": 2,
+        "mean_forecast": 0.525,
+        "observed": 0.5
+      },
+      {
+        "lo": 0.6,
+        "hi": 0.7,
+        "n": 2,
+        "mean_forecast": 0.625,
+        "observed": 0.5
+      },
+      {
+        "lo": 0.7,
+        "hi": 0.8,
+        "n": 3,
+        "mean_forecast": 0.7233,
+        "observed": 0.6667
+      },
+      {
+        "lo": 0.8,
+        "hi": 0.9,
+        "n": 2,
+        "mean_forecast": 0.825,
+        "observed": 1.0
+      },
+      {
+        "lo": 0.9,
+        "hi": 1.0,
+        "n": 2,
+        "mean_forecast": 0.925,
+        "observed": 1.0
+      }
+    ],
+    "claude": [
+      {
+        "lo": 0.3,
+        "hi": 0.4,
+        "n": 5,
+        "mean_forecast": 0.332,
+        "observed": 0.2
+      },
+      {
+        "lo": 0.5,
+        "hi": 0.6,
+        "n": 5,
+        "mean_forecast": 0.564,
+        "observed": 0.6
+      },
+      {
+        "lo": 0.6,
+        "hi": 0.7,
+        "n": 1,
+        "mean_forecast": 0.66,
+        "observed": 1.0
+      },
+      {
+        "lo": 0.7,
+        "hi": 0.8,
+        "n": 5,
+        "mean_forecast": 0.732,
+        "observed": 0.8
+      }
+    ]
+  },
+  "timeseries": {
+    "labels": [
+      "q-003",
+      "q-002",
+      "q-001",
+      "q-004",
+      "q-006",
+      "q-009",
+      "q-011",
+      "q-005",
+      "q-007",
+      "q-008",
+      "q-010",
+      "q-013",
+      "q-012",
+      "q-016",
+      "q-015",
+      "q-014"
+    ],
+    "you": [
+      0.36,
+      0.225,
+      0.1575,
+      0.1688,
+      0.167,
+      0.1596,
+      0.1725,
+      0.1522,
+      0.1978,
+      0.187,
+      0.1736,
+      0.1594,
+      0.1502,
+      0.1451,
+      0.1436,
+      0.1535
+    ],
+    "claude": [
+      0.49,
+      0.2788,
+      0.2084,
+      0.2004,
+      0.1808,
+      0.1619,
+      0.1745,
+      0.1748,
+      0.1667,
+      0.1837,
+      0.1731,
+      0.1734,
+      0.1679,
+      0.1834,
+      0.178,
+      0.1741
+    ]
+  },
+  "resolved": [
+    {
+      "id": "q-003",
+      "text": "UK CPI for December prints at or above 3.0% YoY",
+      "category": "macro",
+      "resolves": "2026-01-21",
+      "you": 0.6,
+      "claude": 0.7,
+      "outcome": 0,
+      "brier_you": 0.36,
+      "brier_claude": 0.49
+    },
+    {
+      "id": "q-002",
+      "text": "FTSE 100 closes above 8,200 on 30 Jan 2026",
+      "category": "equities",
+      "resolves": "2026-01-30",
+      "you": 0.7,
+      "claude": 0.74,
+      "outcome": 1,
+      "brier_you": 0.09,
+      "brier_claude": 0.0676
+    },
+    {
+      "id": "q-001",
+      "text": "GBP/USD closes above 1.27 on 31 Jan 2026",
+      "category": "fx",
+      "resolves": "2026-01-31",
+      "you": 0.85,
+      "claude": 0.74,
+      "outcome": 1,
+      "brier_you": 0.0225,
+      "brier_claude": 0.0676
+    },
+    {
+      "id": "q-004",
+      "text": "Arsenal beat Manchester City (Premier League, 2 Feb 2026)",
+      "category": "football",
+      "resolves": "2026-02-02",
+      "you": 0.55,
+      "claude": 0.58,
+      "outcome": 1,
+      "brier_you": 0.2025,
+      "brier_claude": 0.1764
+    },
+    {
+      "id": "q-006",
+      "text": "Bank of England cuts Bank Rate at the February MPC meeting",
+      "category": "macro",
+      "resolves": "2026-02-05",
+      "you": 0.4,
+      "claude": 0.32,
+      "outcome": 0,
+      "brier_you": 0.16,
+      "brier_claude": 0.1024
+    },
+    {
+      "id": "q-009",
+      "text": "US nonfarm payrolls (January) beat consensus",
+      "category": "macro",
+      "resolves": "2026-02-06",
+      "you": 0.65,
+      "claude": 0.74,
+      "outcome": 1,
+      "brier_you": 0.1225,
+      "brier_claude": 0.0676
+    },
+    {
+      "id": "q-011",
+      "text": "Nvidia closes its earnings week up more than 5%",
+      "category": "equities",
+      "resolves": "2026-02-27",
+      "you": 0.5,
+      "claude": 0.5,
+      "outcome": 0,
+      "brier_you": 0.25,
+      "brier_claude": 0.25
+    },
+    {
+      "id": "q-005",
+      "text": "EUR/GBP stays below 0.86 for the whole of February",
+      "category": "fx",
+      "resolves": "2026-02-28",
+      "you": 0.9,
+      "claude": 0.58,
+      "outcome": 1,
+      "brier_you": 0.01,
+      "brier_claude": 0.1764
+    },
+    {
+      "id": "q-007",
+      "text": "S&P 500 sets a new all-time high during February",
+      "category": "equities",
+      "resolves": "2026-02-28",
+      "you": 0.75,
+      "claude": 0.32,
+      "outcome": 0,
+      "brier_you": 0.5625,
+      "brier_claude": 0.1024
+    },
+    {
+      "id": "q-008",
+      "text": "I run a sub-22:00 parkrun 5k in February",
+      "category": "personal",
+      "resolves": "2026-02-28",
+      "you": 0.3,
+      "claude": 0.58,
+      "outcome": 0,
+      "brier_you": 0.09,
+      "brier_claude": 0.3364
+    },
+    {
+      "id": "q-010",
+      "text": "USD/JPY trades above 155 at any point in February",
+      "category": "fx",
+      "resolves": "2026-02-28",
+      "you": 0.8,
+      "claude": 0.74,
+      "outcome": 1,
+      "brier_you": 0.04,
+      "brier_claude": 0.0676
+    },
+    {
+      "id": "q-013",
+      "text": "I submit my next OU TMA before its cut-off",
+      "category": "personal",
+      "resolves": "2026-03-05",
+      "you": 0.95,
+      "claude": 0.58,
+      "outcome": 1,
+      "brier_you": 0.0025,
+      "brier_claude": 0.1764
+    },
+    {
+      "id": "q-012",
+      "text": "ECB holds policy rates at the March meeting",
+      "category": "macro",
+      "resolves": "2026-03-12",
+      "you": 0.2,
+      "claude": 0.32,
+      "outcome": 0,
+      "brier_you": 0.04,
+      "brier_claude": 0.1024
+    },
+    {
+      "id": "q-016",
+      "text": "GBP/USD closes Q1 above 1.30",
+      "category": "fx",
+      "resolves": "2026-03-31",
+      "you": 0.72,
+      "claude": 0.38,
+      "outcome": 1,
+      "brier_you": 0.0784,
+      "brier_claude": 0.3844
+    },
+    {
+      "id": "q-015",
+      "text": "UK enters a technical recession on the Q4/Q1 prints",
+      "category": "macro",
+      "resolves": "2026-05-15",
+      "you": 0.35,
+      "claude": 0.32,
+      "outcome": 0,
+      "brier_you": 0.1225,
+      "brier_claude": 0.1024
+    },
+    {
+      "id": "q-014",
+      "text": "Liverpool win the 2025/26 Premier League title",
+      "category": "football",
+      "resolves": "2026-05-24",
+      "you": 0.45,
+      "claude": 0.66,
+      "outcome": 1,
+      "brier_you": 0.3025,
+      "brier_claude": 0.1156
+    }
+  ],
+  "open": [
+    {
+      "id": "q-019",
+      "text": "I complete the TM358 first study unit by 15 Jul 2026",
+      "category": "personal",
+      "resolves": "2026-07-15",
+      "you": 0.7,
+      "claude": 0.62
+    },
+    {
+      "id": "q-017",
+      "text": "GBP/USD closes above 1.30 on 31 Jul 2026",
+      "category": "fx",
+      "resolves": "2026-07-31",
+      "you": 0.58,
+      "claude": 0.55
+    },
+    {
+      "id": "q-018",
+      "text": "FTSE 100 closes above 8,800 on 31 Jul 2026",
+      "category": "equities",
+      "resolves": "2026-07-31",
+      "you": 0.47,
+      "claude": 0.5
+    },
+    {
+      "id": "q-020",
+      "text": "Bank of England cuts Bank Rate at the August MPC meeting",
+      "category": "macro",
+      "resolves": "2026-08-07",
+      "you": 0.55,
+      "claude": 0.58
+    }
+  ],
+  "awaiting": [
+    {
+      "id": "q-021",
+      "text": "The dead-reckoning repo has at least 1 GitHub star by 20 Jun 2026",
+      "category": "meta",
+      "resolves": "2026-06-20",
+      "you": 0.65,
+      "claude": 0.55,
+      "hint": "http_json"
+    }
+  ]
+};</script>
+  <script>
+/* Dead Reckoning — tunnel-figure
+   Seeded contour terrain (marching squares over a smooth scalar field) with a
+   route that follows the valley, then tunnels straight through the ridge. The
+   seed makes the terrain deterministic; the route is the signature. */
+(function () {
+  'use strict';
+
+  function mulberry32(a) {
+    return function () {
+      a |= 0; a = (a + 0x6D2B79F5) | 0;
+      var t = Math.imul(a ^ (a >>> 15), 1 | a);
+      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+
+  // smooth field: a few seeded gaussian hills/basins + one dominant ridge
+  function makeField(seed) {
+    var r = mulberry32(seed >>> 0);
+    var bumps = [];
+    for (var i = 0; i < 4; i++) {
+      bumps.push({ cx: 0.12 + r() * 0.76, cy: 0.12 + r() * 0.76,
+                   h: (r() * 2 - 1) * 1.1, s: 0.13 + r() * 0.16 });
+    }
+    var k = 1.1 + r() * 1.1, ph = r() * 6.283, ang = (r() * 0.6 - 0.3);
+    return function (x, y) {
+      var v = 0.55 * Math.sin((x * Math.cos(ang) + y * (0.35 + Math.sin(ang))) * Math.PI * k + ph);
+      for (var i = 0; i < bumps.length; i++) {
+        var b = bumps[i], dx = x - b.cx, dy = y - b.cy;
+        v += b.h * Math.exp(-(dx * dx + dy * dy) / (2 * b.s * b.s));
+      }
+      return v;
+    };
+  }
+
+  function interp(level, va, vb, a, b) { var t = (level - va) / (vb - va); return a + t * (b - a); }
+
+  // marching squares -> array of [[x0,y0],[x1,y1]] segments in unit coords
+  function isolines(field, cols, rows, level) {
+    var segs = [];
+    for (var j = 0; j < rows; j++) {
+      for (var i = 0; i < cols; i++) {
+        var x0 = i / cols, x1 = (i + 1) / cols, y0 = j / rows, y1 = (j + 1) / rows;
+        var a = field(x0, y0), b = field(x1, y0), c = field(x1, y1), d = field(x0, y1);
+        var idx = (a > level ? 8 : 0) | (b > level ? 4 : 0) | (c > level ? 2 : 0) | (d > level ? 1 : 0);
+        if (idx === 0 || idx === 15) continue;
+        var top = [interp(level, a, b, x0, x1), y0];
+        var right = [x1, interp(level, b, c, y0, y1)];
+        var bottom = [interp(level, d, c, x0, x1), y1];
+        var left = [x0, interp(level, a, d, y0, y1)];
+        var P = {
+          1: [left, bottom], 2: [bottom, right], 3: [left, right], 4: [top, right],
+          5: [top, left, bottom, right], 6: [top, bottom], 7: [top, left],
+          8: [top, left], 9: [top, bottom], 10: [top, right, bottom, left],
+          11: [top, right], 12: [left, right], 13: [bottom, right], 14: [left, bottom]
+        }[idx];
+        if (P.length === 2) segs.push([P[0], P[1]]);
+        else { segs.push([P[0], P[1]]); segs.push([P[2], P[3]]); }
+      }
+    }
+    return segs;
+  }
+
+  // valley-following route with a straight tunnel through the middle
+  function makeRoute(field, n) {
+    var pts = [];
+    for (var i = 0; i <= n; i++) {
+      var x = i / n, best = 1e9, by = 0.5;
+      for (var s = 0; s <= 24; s++) {
+        var y = 0.22 + (s / 24) * 0.56, f = field(x, y);
+        if (f < best) { best = f; by = y; }
+      }
+      pts.push([x, by]);
+    }
+    // smooth
+    for (var k = 0; k < 3; k++)
+      for (var i2 = 1; i2 < pts.length - 1; i2++)
+        pts[i2][1] = (pts[i2 - 1][1] + pts[i2][1] + pts[i2 + 1][1]) / 3;
+    // tunnel: straight chord across the central span
+    var t0 = Math.floor(pts.length * 0.40), t1 = Math.floor(pts.length * 0.60);
+    var y0 = pts[t0][1], y1 = pts[t1][1];
+    for (var i3 = t0; i3 <= t1; i3++)
+      pts[i3][1] = y0 + (y1 - y0) * ((i3 - t0) / (t1 - t0));
+    return { pts: pts, t0: t0, t1: t1 };
+  }
+
+  function cssVar(name) {
+    return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+  }
+
+  function draw(canvas, opts) {
+    opts = opts || {};
+    var seed = parseInt(opts.seed != null ? opts.seed : canvas.dataset.seed || '7', 10);
+    var field = makeField(seed);
+    var dpr = Math.min(window.devicePixelRatio || 1, 2);
+    var W = canvas.clientWidth, H = canvas.clientHeight;
+    canvas.width = W * dpr; canvas.height = H * dpr;
+    var ctx = canvas.getContext('2d');
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+    var contourCol = cssVar('--contour') || 'rgba(143,162,184,.10)';
+    var contourBold = cssVar('--contour-bold') || 'rgba(143,162,184,.18)';
+    var routeCol = cssVar('--route-you') || '#e0954a';
+
+    // contours -> offscreen
+    var cols = Math.max(24, Math.round(W / 13)), rows = Math.max(14, Math.round(H / 13));
+    var levels = [];
+    for (var L = -1.3; L <= 1.3; L += 0.26) levels.push(+L.toFixed(2));
+    var off = document.createElement('canvas');
+    off.width = canvas.width; off.height = canvas.height;
+    var oc = off.getContext('2d'); oc.setTransform(dpr, 0, 0, dpr, 0, 0);
+    levels.forEach(function (lv, li) {
+      var segs = isolines(field, cols, rows, lv);
+      oc.lineWidth = (li % 3 === 0) ? 1.1 : 0.7;
+      oc.strokeStyle = (li % 3 === 0) ? contourBold : contourCol;
+      oc.beginPath();
+      segs.forEach(function (s) { oc.moveTo(s[0][0] * W, s[0][1] * H); oc.lineTo(s[1][0] * W, s[1][1] * H); });
+      oc.stroke();
+    });
+
+    var route = makeRoute(field, 120);
+
+    function render(progress) {
+      ctx.clearRect(0, 0, W, H);
+      ctx.drawImage(off, 0, 0, W, H);
+      var cut = Math.floor(route.pts.length * progress);
+      // soft underglow
+      ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+      ctx.strokeStyle = routeCol; ctx.globalAlpha = 0.18; ctx.lineWidth = 6;
+      ctx.beginPath();
+      for (var i = 0; i <= cut; i++) { var p = route.pts[i]; i ? ctx.lineTo(p[0] * W, p[1] * H) : ctx.moveTo(p[0] * W, p[1] * H); }
+      ctx.stroke();
+      // route line
+      ctx.globalAlpha = 1; ctx.lineWidth = 1.6;
+      ctx.beginPath();
+      for (var i2 = 0; i2 <= cut; i2++) { var q = route.pts[i2]; i2 ? ctx.lineTo(q[0] * W, q[1] * H) : ctx.moveTo(q[0] * W, q[1] * H); }
+      ctx.stroke();
+      // tunnel portals (perpendicular ticks) once revealed
+      [route.t0, route.t1].forEach(function (ti) {
+        if (cut < ti) return;
+        var p = route.pts[ti], pa = route.pts[Math.max(0, ti - 1)], pb = route.pts[Math.min(route.pts.length - 1, ti + 1)];
+        var ang = Math.atan2((pb[1] - pa[1]) * H, (pb[0] - pa[0]) * W) + Math.PI / 2, r = 7;
+        ctx.beginPath();
+        ctx.moveTo(p[0] * W + Math.cos(ang) * r, p[1] * H + Math.sin(ang) * r);
+        ctx.lineTo(p[0] * W - Math.cos(ang) * r, p[1] * H - Math.sin(ang) * r);
+        ctx.stroke();
+      });
+      // leading marker
+      if (cut > 0 && cut < route.pts.length) {
+        var head = route.pts[cut];
+        ctx.fillStyle = routeCol;
+        ctx.beginPath(); ctx.arc(head[0] * W, head[1] * H, 2.6, 0, 6.283); ctx.fill();
+      }
+    }
+
+    var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reduce) { render(1); return { redraw: function () { draw(canvas, opts); } }; }
+    var start = null, dur = 1400;
+    function step(ts) {
+      if (start === null) start = ts;
+      var t = Math.min(1, (ts - start) / dur);
+      render(t * t * (3 - 2 * t)); // smoothstep
+      if (t < 1) requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+    return { redraw: function () { draw(canvas, opts); } };
+  }
+
+  window.Tunnel = { draw: draw };
+
+  function init() {
+    var els = document.querySelectorAll('[data-tunnel]');
+    els.forEach(function (el) {
+      var inst = draw(el);
+      var rt;
+      window.addEventListener('resize', function () {
+        clearTimeout(rt); rt = setTimeout(function () { inst.redraw(); }, 180);
+      });
+    });
+  }
+  if (document.readyState !== 'loading') init();
+  else document.addEventListener('DOMContentLoaded', init);
+})();
+
+  </script>
+  <script>
+/* Dead Reckoning — dashboard
+   Reads window.__DATA__ if present (self-contained preview), else fetches
+   ./data.json (the file the nightly Action regenerates). Renders everything
+   below the hero into #app. Plots are hand-built SVG — no chart library. */
+(function () {
+  'use strict';
+
+  // ---- formatting -----------------------------------------------------------
+  var f3 = function (x) { return (x == null || isNaN(x)) ? '—' : x.toFixed(3); };
+  var f2 = function (x) { return (x == null || isNaN(x)) ? '—' : x.toFixed(2); };
+  var pc = function (x) { return Math.round(x * 100) + '%'; };
+  function esc(s) { return String(s).replace(/[&<>"]/g, function (c) {
+    return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+  function fmtDate(s) {
+    var d = new Date(s + 'T00:00:00Z');
+    return d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric', timeZone: 'UTC' });
+  }
+
+  var YOU = 'var(--route-you)', MODEL = 'var(--route-model)';
+
+  // ---- scoreboard -----------------------------------------------------------
+  function scoreboard(d) {
+    var y = d.forecasters.you, c = d.forecasters.claude;
+    var youLeads = y.brier <= c.brier;
+    function card(f, color, leads) {
+      return '' +
+        '<div class="score-card" style="border-top:2px solid ' + color + '">' +
+          '<div class="eyebrow" style="color:' + color + '">' + esc(f.label) +
+            (leads ? ' · leading' : '') + '</div>' +
+          '<div class="score-brier mono">' + f3(f.brier) + '</div>' +
+          '<div class="score-sub mono dim">Brier · lower is better</div>' +
+          '<div class="score-row mono">' +
+            '<span><span class="faint">BSS</span> ' + f3(f.bss) + '</span>' +
+            '<span><span class="faint">log loss</span> ' + f3(f.logloss) + '</span>' +
+          '</div>' +
+        '</div>';
+    }
+    return '<section class="standing">' +
+      card(y, YOU, youLeads) +
+      '<div class="versus mono faint">vs</div>' +
+      card(c, MODEL, !youLeads) +
+      '<div class="score-meta">' +
+        '<div class="eyebrow">Ledger</div>' +
+        '<div class="mono"><span class="figure">' + d.counts.resolved + '</span> resolved</div>' +
+        '<div class="mono"><span class="figure">' + d.counts.open + '</span> open · ' +
+          '<span class="figure">' + d.counts.awaiting + '</span> awaiting</div>' +
+        '<div class="mono dim">base rate ' + pc(d.base_rate) + '</div>' +
+      '</div>' +
+    '</section>';
+  }
+
+  // ---- reliability diagram + sharpness --------------------------------------
+  function calibration(d) {
+    var ML = 52, MR = 16, MT = 16, S = 336;           // square plot
+    var X0 = ML, X1 = ML + S, Yc0 = MT, Yc1 = MT + S; // calibration band
+    var STRIP = 70, SG = 26, SY1 = Yc1 + SG + STRIP;  // sharpness strip baseline
+    var W = X1 + MR, Hh = SY1 + 26;
+    var X = function (p) { return X0 + p * S; };
+    var Y = function (o) { return Yc1 - o * S; };
+
+    var s = '<svg viewBox="0 0 ' + W + ' ' + Hh + '" role="img" ' +
+      'aria-label="Reliability diagram: observed frequency against forecast probability">';
+
+    // grid + frame
+    var ticks = [0, 0.25, 0.5, 0.75, 1];
+    ticks.forEach(function (t) {
+      s += '<line x1="' + X(t) + '" y1="' + Yc0 + '" x2="' + X(t) + '" y2="' + Yc1 +
+        '" style="stroke:var(--contour)"/>';
+      s += '<line x1="' + X0 + '" y1="' + Y(t) + '" x2="' + X1 + '" y2="' + Y(t) +
+        '" style="stroke:var(--contour)"/>';
+      s += '<text x="' + X(t) + '" y="' + (SY1 + 16) + '" class="ax">' + t.toFixed(2) + '</text>';
+      s += '<text x="' + (X0 - 8) + '" y="' + (Y(t) + 3) + '" class="ax" text-anchor="end">' + t.toFixed(2) + '</text>';
+    });
+    s += '<rect x="' + X0 + '" y="' + Yc0 + '" width="' + S + '" height="' + S +
+      '" fill="none" style="stroke:var(--hairline)"/>';
+    // perfect-calibration diagonal
+    s += '<line x1="' + X(0) + '" y1="' + Y(0) + '" x2="' + X(1) + '" y2="' + Y(1) +
+      '" style="stroke:var(--ink-faint)" stroke-dasharray="3 4"/>';
+    s += '<text x="' + (X(0.5) + 6) + '" y="' + (Y(0.5) - 7) + '" class="ax" ' +
+      'transform="rotate(-45 ' + X(0.5) + ' ' + Y(0.5) + ')">perfect calibration</text>';
+
+    // series
+    function series(bins, color) {
+      if (!bins.length) return '';
+      var g = '<g>';
+      var pts = bins.map(function (b) { return X(b.mean_forecast) + ',' + Y(b.observed); }).join(' ');
+      g += '<polyline points="' + pts + '" fill="none" style="stroke:' + color +
+        ';opacity:.55" stroke-width="1.4"/>';
+      bins.forEach(function (b) {
+        var r = 3 + Math.sqrt(b.n) * 2.4;
+        g += '<circle cx="' + X(b.mean_forecast) + '" cy="' + Y(b.observed) + '" r="' + r.toFixed(1) +
+          '" style="fill:' + color + ';fill-opacity:.18;stroke:' + color + '"/>';
+      });
+      return g + '</g>';
+    }
+    s += series(d.calibration.claude, MODEL);
+    s += series(d.calibration.you, YOU);
+
+    // axis titles
+    s += '<text x="' + X(0.5) + '" y="' + (SY1 + 24) + '" class="ax-t" text-anchor="middle">forecast probability</text>';
+    s += '<text class="ax-t" text-anchor="middle" transform="translate(' + (X0 - 34) + ' ' +
+      ((Yc0 + Yc1) / 2) + ') rotate(-90)">observed frequency</text>';
+
+    // sharpness histogram (where each forecaster placed its bets)
+    var maxN = 1;
+    ['you', 'claude'].forEach(function (k) { d.calibration[k].forEach(function (b) { maxN = Math.max(maxN, b.n); }); });
+    s += '<text x="' + X0 + '" y="' + (Yc1 + 18) + '" class="ax-t">sharpness — forecasts per bin</text>';
+    s += '<line x1="' + X0 + '" y1="' + SY1 + '" x2="' + X1 + '" y2="' + SY1 + '" style="stroke:var(--hairline)"/>';
+    function bars(bins, color, off) {
+      var g = '';
+      bins.forEach(function (b) {
+        var mid = (b.lo + b.hi) / 2, h = (b.n / maxN) * STRIP;
+        g += '<rect x="' + (X(mid) + off) + '" y="' + (SY1 - h) + '" width="5" height="' + h +
+          '" style="fill:' + color + ';fill-opacity:.8"/>';
+      });
+      return g;
+    }
+    s += bars(d.calibration.you, YOU, -5.5);
+    s += bars(d.calibration.claude, MODEL, 0.5);
+    s += '</svg>';
+
+    return '<section><div class="eyebrow">Calibration</div>' +
+      '<h2 class="section">Do the probabilities mean what they say?</h2>' +
+      '<div class="grid-2">' +
+        '<figure class="panel plot">' + s + '</figure>' +
+        '<div class="readout">' +
+          '<p class="lede">A point sitting on the dashed line is honest: of the times you said <span class="mono">70%</span>, ' +
+          'about <span class="mono">70%</span> happened. Above the line is under-confidence, below is over-confidence. ' +
+          'Point size is how many forecasts landed in that bin.</p>' +
+          '<ul class="key">' +
+            '<li><span class="dot" style="background:' + YOU + '"></span> You</li>' +
+            '<li><span class="dot" style="background:' + MODEL + '"></span> Claude</li>' +
+          '</ul>' +
+        '</div>' +
+      '</div></section>';
+  }
+
+  // ---- Murphy decomposition -------------------------------------------------
+  function decomposition(d) {
+    var y = d.forecasters.you, c = d.forecasters.claude;
+    var maxRel = Math.max(y.reliability, c.reliability, 0.001);
+    var maxRes = Math.max(y.resolution, c.resolution, 0.001);
+    function bar(v, max, color) {
+      return '<span class="meter"><span style="width:' + (v / max * 100) + '%;background:' + color + '"></span></span>';
+    }
+    function row(label, gloss, yv, cv, kind) {
+      var max = kind === 'rel' ? maxRel : kind === 'res' ? maxRes : 0;
+      var bars = kind ? '<td>' + bar(yv, max, YOU) + '</td><td>' + bar(cv, max, MODEL) + '</td>' :
+        '<td></td><td></td>';
+      return '<tr><th>' + label + '<span class="faint"> · ' + gloss + '</span></th>' +
+        '<td class="mono">' + f3(yv) + '</td><td class="mono">' + f3(cv) + '</td>' + bars + '</tr>';
+    }
+    return '<section><div class="eyebrow">Decomposition</div>' +
+      '<h2 class="section">Why one of you is ahead</h2>' +
+      '<div class="panel"><table class="decomp">' +
+        '<thead><tr><th></th><th class="mono" style="color:' + YOU + '">You</th>' +
+          '<th class="mono" style="color:' + MODEL + '">Claude</th><th colspan="2"></th></tr></thead><tbody>' +
+        row('Reliability', 'calibration error, want 0', y.reliability, c.reliability, 'rel') +
+        row('Resolution', 'discrimination, want high', y.resolution, c.resolution, 'res') +
+        row('Uncertainty', 'irreducible, set by base rate', y.uncertainty, c.uncertainty, null) +
+        '<tr class="sum"><th>Brier <span class="faint"> · reliability − resolution + uncertainty</span></th>' +
+          '<td class="mono">' + f3(y.brier) + '</td><td class="mono">' + f3(c.brier) + '</td><td colspan="2"></td></tr>' +
+      '</tbody></table>' +
+      '<p class="lede" style="margin-top:1rem">' + verdict(y, c) + '</p>' +
+      '</div></section>';
+  }
+  function verdict(y, c) {
+    var sharper = y.resolution > c.resolution ? 'You' : 'Claude';
+    var calib = y.reliability < c.reliability ? 'You' : 'Claude';
+    var winner = y.brier < c.brier ? 'your' : "the model's";
+    if (sharper !== calib)
+      return sharper + ' make the sharper, better-discriminated calls; ' + calib.toLowerCase() +
+        ' is the better-calibrated. On net Brier the ' + (sharper === 'You' ? 'discrimination' : 'calibration') +
+        ' wins — ' + winner + ' edge holds.';
+    return sharper + ' lead on both calibration and discrimination here.';
+  }
+
+  // ---- cumulative Brier -----------------------------------------------------
+  function timeseries(d) {
+    var t = d.timeseries, n = t.labels.length;
+    if (!n) return '';
+    var ML = 52, MR = 16, MT = 18, MB = 40, W = 760, H = 260;
+    var PW = W - ML - MR, PH = H - MT - MB;
+    var maxY = Math.max.apply(null, t.you.concat(t.claude).concat([d.base_rate * (1 - d.base_rate)]));
+    maxY = Math.ceil(maxY * 20) / 20 + 0.0;
+    var X = function (i) { return ML + (n === 1 ? PW / 2 : (i / (n - 1)) * PW); };
+    var Y = function (v) { return MT + PH - (v / maxY) * PH; };
+    var s = '<svg viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="Cumulative Brier score over resolved forecasts">';
+    for (var g = 0; g <= 4; g++) {
+      var v = maxY * g / 4;
+      s += '<line x1="' + ML + '" y1="' + Y(v) + '" x2="' + (W - MR) + '" y2="' + Y(v) + '" style="stroke:var(--contour)"/>';
+      s += '<text x="' + (ML - 8) + '" y="' + (Y(v) + 3) + '" class="ax" text-anchor="end">' + v.toFixed(2) + '</text>';
+    }
+    // base-rate (no-skill) reference
+    var ref = d.base_rate * (1 - d.base_rate);
+    s += '<line x1="' + ML + '" y1="' + Y(ref) + '" x2="' + (W - MR) + '" y2="' + Y(ref) +
+      '" style="stroke:var(--ink-faint)" stroke-dasharray="2 4"/>';
+    s += '<text x="' + (W - MR) + '" y="' + (Y(ref) - 5) + '" class="ax" text-anchor="end">always base rate</text>';
+    function line(arr, color) {
+      var pts = arr.map(function (v, i) { return X(i) + ',' + Y(v); }).join(' ');
+      var g = '<polyline points="' + pts + '" fill="none" style="stroke:' + color + '" stroke-width="1.8"/>';
+      g += '<circle cx="' + X(arr.length - 1) + '" cy="' + Y(arr[arr.length - 1]) + '" r="3" style="fill:' + color + '"/>';
+      return g;
+    }
+    s += line(t.claude, MODEL) + line(t.you, YOU);
+    // x labels: first, middle, last
+    [0, Math.floor((n - 1) / 2), n - 1].filter(function (v, i, a) { return a.indexOf(v) === i; }).forEach(function (i) {
+      s += '<text x="' + X(i) + '" y="' + (H - 14) + '" class="ax" text-anchor="middle">' + esc(t.labels[i]) + '</text>';
+    });
+    s += '<text class="ax-t" text-anchor="middle" transform="translate(' + (ML - 36) + ' ' + (MT + PH / 2) + ') rotate(-90)">cumulative Brier</text>';
+    s += '</svg>';
+    return '<section><div class="eyebrow">Track</div>' +
+      '<h2 class="section">Running score, oldest to newest</h2>' +
+      '<figure class="panel plot wide">' + s +
+      '<figcaption class="dim">Each step folds in one resolved forecast. Below the dashed line is genuine skill over forecasting the base rate.</figcaption>' +
+      '</figure></section>';
+  }
+
+  // ---- ledgers --------------------------------------------------------------
+  function tag(cat) { return '<span class="cat mono">' + esc(cat) + '</span>'; }
+
+  function positions(d) {
+    if (!d.open.length) return '';
+    var rows = d.open.map(function (q) {
+      return '<tr><td class="mono id">' + esc(q.id) + '</td>' +
+        '<td>' + esc(q.text) + ' ' + tag(q.category) + '</td>' +
+        '<td class="mono" style="color:' + YOU + '">' + f2(q.you) + '</td>' +
+        '<td class="mono" style="color:' + MODEL + '">' + f2(q.claude) + '</td>' +
+        '<td class="mono dim">' + fmtDate(q.resolves) + '</td></tr>';
+    }).join('');
+    return '<section><div class="eyebrow">Open positions</div>' +
+      '<h2 class="section">Committed, not yet resolved</h2>' +
+      '<div class="panel"><table class="ledger"><thead><tr>' +
+        '<th>ID</th><th>Question</th><th style="color:' + YOU + '">You</th>' +
+        '<th style="color:' + MODEL + '">Claude</th><th>Resolves</th></tr></thead>' +
+        '<tbody>' + rows + '</tbody></table></div></section>';
+  }
+
+  function awaiting(d) {
+    if (!d.awaiting.length) return '';
+    var rows = d.awaiting.map(function (q) {
+      return '<tr><td class="mono id">' + esc(q.id) + '</td>' +
+        '<td>' + esc(q.text) + ' ' + tag(q.category) + '</td>' +
+        '<td class="mono" style="color:' + YOU + '">' + f2(q.you) + '</td>' +
+        '<td class="mono" style="color:' + MODEL + '">' + f2(q.claude) + '</td>' +
+        '<td class="mono dim">' + fmtDate(q.resolves) + '</td>' +
+        '<td class="mono faint">' + esc(q.hint) + '</td></tr>';
+    }).join('');
+    return '<section><div class="eyebrow">Awaiting fix</div>' +
+      '<h2 class="section">Past due, needs resolving</h2>' +
+      '<div class="panel"><table class="ledger"><thead><tr>' +
+        '<th>ID</th><th>Question</th><th style="color:' + YOU + '">You</th>' +
+        '<th style="color:' + MODEL + '">Claude</th><th>Due</th><th>Resolver</th></tr></thead>' +
+        '<tbody>' + rows + '</tbody></table></div></section>';
+  }
+
+  function log(d) {
+    if (!d.resolved.length) return '';
+    var rows = d.resolved.slice().reverse().map(function (q) {
+      var hit = q.outcome === 1;
+      var oc = '<span style="color:' + (hit ? 'var(--yes)' : 'var(--no)') + '">' + (hit ? 'yes' : 'no') + '</span>';
+      var win = q.brier_you <= q.brier_claude;
+      return '<tr><td class="mono id">' + esc(q.id) + '</td>' +
+        '<td>' + esc(q.text) + ' ' + tag(q.category) + '</td>' +
+        '<td class="mono" style="color:' + YOU + '">' + f2(q.you) + '</td>' +
+        '<td class="mono" style="color:' + MODEL + '">' + f2(q.claude) + '</td>' +
+        '<td class="mono">' + oc + '</td>' +
+        '<td class="mono' + (win ? ' lead' : '') + '">' + f3(q.brier_you) + '</td></tr>';
+    }).join('');
+    return '<section><div class="eyebrow">Log</div>' +
+      '<h2 class="section">Resolved reckonings</h2>' +
+      '<div class="panel"><table class="ledger"><thead><tr>' +
+        '<th>ID</th><th>Question</th><th style="color:' + YOU + '">You</th>' +
+        '<th style="color:' + MODEL + '">Claude</th><th>Outcome</th><th>Your Brier</th></tr></thead>' +
+        '<tbody>' + rows + '</tbody></table>' +
+        '<p class="dim" style="margin:.9rem 0 0">Highlighted Brier marks the forecast where you matched or beat the model.</p>' +
+      '</div></section>';
+  }
+
+  // ---- footer ---------------------------------------------------------------
+  function footer(d) {
+    return '<footer><hr class="rule"/>' +
+      '<p class="mono faint">Generated ' + esc(d.generated_at) +
+      ' · forecasts are pre-registered by commit timestamp · regenerated nightly by GitHub Actions</p></footer>';
+  }
+
+  // ---- boot -----------------------------------------------------------------
+  function render(d) {
+    var app = document.getElementById('app');
+    app.innerHTML =
+      scoreboard(d) + '<hr class="rule"/>' +
+      calibration(d) +
+      decomposition(d) +
+      timeseries(d) +
+      positions(d) +
+      awaiting(d) +
+      log(d) +
+      footer(d);
+  }
+
+  function fail(msg) {
+    var app = document.getElementById('app');
+    app.innerHTML = '<section class="panel"><div class="eyebrow">No fix</div>' +
+      '<p>Could not load <span class="mono">data.json</span>. ' + esc(msg) +
+      '</p><p class="dim">Run the scorer (<span class="mono">Rscript R/score.R</span>) to generate it.</p></section>';
+  }
+
+  if (window.__DATA__) { render(window.__DATA__); return; }
+  fetch('./data.json', { cache: 'no-store' })
+    .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+    .then(render)
+    .catch(function (e) { fail(e.message); });
+})();
+
+  </script>
+</body>
+</html>
