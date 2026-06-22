@@ -10,9 +10,10 @@
 # Each block has an empty  forecasts: { you: }  — fill in your probability that
 # the statement is TRUE, a decimal between 0.01 and 0.99, then commit. Sharper
 # (nearer 0/1) is rewarded only when you are right; that is the point of a proper
-# scoring rule. Leave `claude` out: if the ANTHROPIC_API_KEY secret is set, the
-# model registers its own number on each still-open question (committed and
-# git-dated too); if not, it simply stays blank.
+# scoring rule. The `claude:` values are Claude's own rival forecasts, committed
+# from a Claude session and git-dated exactly like yours — you only fill `you:`.
+# For new questions, have Claude forecast them in a session, or set the optional
+# ANTHROPIC_API_KEY secret to let the nightly Action register them automatically.
 #
 # To add a question:    append a block, set forecasts.you (+ resolves/resolution).
 # To resolve manually:  set `outcome:` to 1 (happened) or 0 (did not), then commit.
@@ -27,7 +28,7 @@ questions:
     created: 2026-06-22
     resolves: 2026-09-30
     resolution: { type: manual, note: "Bank of England daily spot, 16:00 fix" }
-    forecasts: { you: }   # <- your P(true), 0.01–0.99
+    forecasts: { you: , claude: 0.40 }   # <- your P(true), 0.01–0.99
 
   - id: q-002
     text: "EUR/USD closes above 1.16 on 31 Dec 2026"
@@ -35,7 +36,7 @@ questions:
     created: 2026-06-22
     resolves: 2026-12-31
     resolution: { type: manual, note: "ECB euro reference exchange rate" }
-    forecasts: { you: }
+    forecasts: { you: , claude: 0.40 }
 
   - id: q-003
     text: "USD/JPY trades above 150 at any point in the second half of 2026"
@@ -43,7 +44,7 @@ questions:
     created: 2026-06-22
     resolves: 2026-12-31
     resolution: { type: manual, note: "Any intraday print, 1 Jul–31 Dec 2026" }
-    forecasts: { you: }
+    forecasts: { you: , claude: 0.80 }
 
   # ---- equities -----------------------------------------------------------
   - id: q-004
@@ -52,7 +53,7 @@ questions:
     created: 2026-06-22
     resolves: 2026-09-30
     resolution: { type: manual, note: "LSE official close" }
-    forecasts: { you: }
+    forecasts: { you: , claude: 0.38 }
 
   - id: q-005
     text: "The S&P 500 ends 2026 above its 2025 year-end closing level"
@@ -60,7 +61,7 @@ questions:
     created: 2026-06-22
     resolves: 2026-12-31
     resolution: { type: manual, note: "Official close, 31 Dec 2026 vs 31 Dec 2025" }
-    forecasts: { you: }
+    forecasts: { you: , claude: 0.66 }
 
   - id: q-006
     text: "The S&P 500 sets a new intraday all-time high at some point in Q3 2026"
@@ -68,7 +69,7 @@ questions:
     created: 2026-06-22
     resolves: 2026-09-30
     resolution: { type: manual, note: "Any intraday print, Jul–Sep 2026, above the prior ATH" }
-    forecasts: { you: }
+    forecasts: { you: , claude: 0.60 }
 
   # ---- macro --------------------------------------------------------------
   - id: q-007
@@ -77,7 +78,7 @@ questions:
     created: 2026-06-22
     resolves: 2026-09-17
     resolution: { type: manual, note: "MPC decision and minutes" }
-    forecasts: { you: }
+    forecasts: { you: , claude: 0.42 }
 
   - id: q-008
     text: "The US Federal Reserve lowers the federal funds target range at its September 2026 FOMC meeting"
@@ -85,7 +86,7 @@ questions:
     created: 2026-06-22
     resolves: 2026-09-16
     resolution: { type: manual, note: "FOMC statement" }
-    forecasts: { you: }
+    forecasts: { you: , claude: 0.45 }
 
   - id: q-009
     text: "UK headline CPI inflation (YoY) for August 2026 prints at or below 2.5%"
@@ -93,7 +94,7 @@ questions:
     created: 2026-06-22
     resolves: 2026-09-16
     resolution: { type: manual, note: "ONS consumer price inflation release" }
-    forecasts: { you: }
+    forecasts: { you: , claude: 0.45 }
 
   - id: q-010
     text: "US headline CPI inflation (YoY) falls below 2.0% in at least one monthly print during H2 2026"
@@ -101,7 +102,7 @@ questions:
     created: 2026-06-22
     resolves: 2026-12-31
     resolution: { type: manual, note: "BLS CPI, any month Jul–Dec 2026 (Dec print lands Jan 2027)" }
-    forecasts: { you: }
+    forecasts: { you: , claude: 0.28 }
 
   # ---- football -----------------------------------------------------------
   - id: q-011
@@ -110,7 +111,7 @@ questions:
     created: 2026-06-22
     resolves: 2026-11-01
     resolution: { type: manual, note: "League table after the day's fixtures" }
-    forecasts: { you: }
+    forecasts: { you: , claude: 0.25 }
 
   - id: q-012
     text: "Manchester City finish in the top four of the 2026/27 Premier League"
@@ -118,7 +119,7 @@ questions:
     created: 2026-06-22
     resolves: 2027-05-30
     resolution: { type: manual, note: "Final league table" }
-    forecasts: { you: }
+    forecasts: { you: , claude: 0.74 }
 
   - id: q-013
     text: "Real Madrid reach the quarter-finals of the 2026/27 UEFA Champions League"
@@ -126,7 +127,7 @@ questions:
     created: 2026-06-22
     resolves: 2027-04-09
     resolution: { type: manual, note: "Official UEFA results" }
-    forecasts: { you: }
+    forecasts: { you: , claude: 0.64 }
 
   # ---- meta ---------------------------------------------------------------
   # q-014 demonstrates the http_json resolver: the daily Action fetches a JSON
@@ -144,7 +145,7 @@ questions:
       op: ">="
       threshold: 5
       note: "Resolved automatically against the GitHub REST API"
-    forecasts: { you: }
+    forecasts: { you: , claude: 0.30 }
 
   - id: q-015
     text: "This log contains at least 20 resolved forecasts by 31 Dec 2026"
@@ -152,7 +153,7 @@ questions:
     created: 2026-06-22
     resolves: 2026-12-31
     resolution: { type: manual, note: "Count of questions carrying an outcome on 31 Dec 2026" }
-    forecasts: { you: }
+    forecasts: { you: , claude: 0.35 }
 
   # ---- personal (add your own) --------------------------------------------
   # Only you can write these, since only you know the ground truth. Copy a block
