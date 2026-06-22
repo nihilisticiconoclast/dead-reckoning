@@ -8,7 +8,7 @@
   // ---- formatting -----------------------------------------------------------
   var f3 = function (x) { return (x == null || isNaN(x)) ? '—' : x.toFixed(3); };
   var f2 = function (x) { return (x == null || isNaN(x)) ? '—' : x.toFixed(2); };
-  var pc = function (x) { return Math.round(x * 100) + '%'; };
+  var pc = function (x) { return (x == null || isNaN(x)) ? '—' : Math.round(x * 100) + '%'; };
   function esc(s) { return String(s).replace(/[&<>"]/g, function (c) {
     return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
   function fmtDate(s) {

@@ -86,7 +86,7 @@ score_one <- function(rs, key) {
     )
   }
   uncertainty <- obar * (1 - obar)
-  bss <- if (uncertainty > 0) 1 - brier / uncertainty else NA_real_
+  bss <- if (!is.na(uncertainty) && uncertainty > 0) 1 - brier / uncertainty else NA_real_
 
   list(
     summary = list(
