@@ -155,13 +155,39 @@ questions:
     resolution: { type: manual, note: "Count of questions carrying an outcome on 31 Dec 2026" }
     forecasts: { you: , claude: 0.35 }
 
-  # ---- personal (add your own) --------------------------------------------
-  # Only you can write these, since only you know the ground truth. Copy a block
-  # above and make it objectively resolvable, e.g.:
-  #   - id: q-016
-  #     text: "I submit my next OU TMA before its cut-off"
-  #     category: personal
-  #     created: 2026-06-22
-  #     resolves: 2026-09-30
-  #     resolution: { type: manual, note: "OU submission receipt" }
-  #     forecasts: { you: }
+  # ---- personal ----------------------------------------------------------
+  # Starter questions, seeded from the kinds of goals in your original data.
+  # EDIT the text/dates to match your actual life, delete any that don't apply,
+  # and add your own. you: is yours to fill; claude: is Claude's guess — a weak
+  # prior here, since only you know the ground truth, so overwrite it freely.
+  - id: q-016
+    text: "I complete at least one parkrun (5k) during July 2026"
+    category: personal
+    created: 2026-06-22
+    resolves: 2026-07-31
+    resolution: { type: manual, note: "parkrun results page" }
+    forecasts: { you: , claude: 0.60 }
+
+  - id: q-017
+    text: "I read at least three books for leisure between July and September 2026"
+    category: personal
+    created: 2026-06-22
+    resolves: 2026-09-30
+    resolution: { type: manual, note: "Personal reading log / Goodreads" }
+    forecasts: { you: , claude: 0.55 }
+
+  - id: q-018
+    text: "I commit to a personal GitHub repo on at least 20 distinct days in Q3 2026"
+    category: personal
+    created: 2026-06-22
+    resolves: 2026-09-30
+    resolution: { type: manual, note: "GitHub contributions graph, Jul-Sep 2026" }
+    forecasts: { you: , claude: 0.60 }
+
+  - id: q-019
+    text: "I take at least one overnight trip away from home before 30 September 2026"
+    category: personal
+    created: 2026-06-22
+    resolves: 2026-09-30
+    resolution: { type: manual, note: "Self-reported; any night spent away from home" }
+    forecasts: { you: , claude: 0.82 }

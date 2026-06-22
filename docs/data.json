@@ -1,8 +1,8 @@
 {
-  "generated_at": "2026-06-22T14:45:00Z",
+  "generated_at": "2026-06-22T14:55:00Z",
   "counts": {
     "resolved": 0,
-    "open": 15,
+    "open": 19,
     "awaiting": 0
   },
   "base_rate": null,
@@ -39,6 +39,14 @@
   },
   "resolved": [],
   "open": [
+    {
+      "id": "q-016",
+      "text": "I complete at least one parkrun (5k) during July 2026",
+      "category": "personal",
+      "resolves": "2026-07-31",
+      "you": null,
+      "claude": 0.6
+    },
     {
       "id": "q-008",
       "text": "The US Federal Reserve lowers the federal funds target range at its September 2026 FOMC meeting",
@@ -86,6 +94,30 @@
       "resolves": "2026-09-30",
       "you": null,
       "claude": 0.6
+    },
+    {
+      "id": "q-017",
+      "text": "I read at least three books for leisure between July and September 2026",
+      "category": "personal",
+      "resolves": "2026-09-30",
+      "you": null,
+      "claude": 0.55
+    },
+    {
+      "id": "q-018",
+      "text": "I commit to a personal GitHub repo on at least 20 distinct days in Q3 2026",
+      "category": "personal",
+      "resolves": "2026-09-30",
+      "you": null,
+      "claude": 0.6
+    },
+    {
+      "id": "q-019",
+      "text": "I take at least one overnight trip away from home before 30 September 2026",
+      "category": "personal",
+      "resolves": "2026-09-30",
+      "you": null,
+      "claude": 0.82
     },
     {
       "id": "q-011",
