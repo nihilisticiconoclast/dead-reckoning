@@ -1,0 +1,54 @@
+name: reckon
+
+on:
+  schedule:
+    - cron: '0 6 * * *'        # 06:00 UTC daily
+  workflow_dispatch: {}         # run on demand from the Actions tab
+
+permissions:
+  contents: write               # to commit the regenerated data back
+
+concurrency:
+  group: reckon
+  cancel-in-progress: false
+
+jobs:
+  reckon:
+    runs-on: ubuntu-latest
+    env:
+      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}   # empty unless you set it
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: r-lib/actions/setup-r@v2
+        with:
+          use-public-rspm: true   # Linux binary packages — fast installs
+
+      - name: Install core R packages
+        run: Rscript -e 'install.packages(c("jsonlite", "yaml"))'
+
+      - name: Install model-forecast dependency
+        if: env.ANTHROPIC_API_KEY != ''
+        run: Rscript -e 'install.packages("httr2")'
+
+      - name: Register model forecasts on open questions
+        if: env.ANTHROPIC_API_KEY != ''
+        run: Rscript R/forecast_claude.R
+
+      - name: Resolve due questions
+        run: Rscript R/resolve.R
+
+      - name: Score
+        run: Rscript R/score.R
+
+      - name: Commit regenerated data
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/data.json data/questions.yml
+          if git diff --cached --quiet; then
+            echo "Nothing to commit."
+          else
+            git commit -m "chore: nightly reckon ($(date -u +%Y-%m-%d))"
+            git push
+          fi

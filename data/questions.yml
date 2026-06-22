@@ -1,0 +1,212 @@
+# Dead Reckoning — forecast ledger
+# ---------------------------------
+# This file is the single source of truth. A forecast is *committed* the moment
+# it lands in a commit on `develop`/`main`; the commit timestamp is your
+# tamper-evident proof that the probability pre-dates the outcome. Do not edit a
+# forecast after its `resolves` date — that is the one rule the whole instrument
+# rests on.
+#
+# To add a question:    append a block, set forecasts.you (and resolves/resolution).
+# To resolve manually:  set `outcome:` to 1 (happened) or 0 (did not).
+# Automatic resolution: give it a `resolution.type: http_json` block (see q-021).
+#
+# Probabilities are P(the statement is true). Sharper (nearer 0/1) is rewarded
+# only when you are right — that is the point of a proper scoring rule.
+
+questions:
+
+  # ---- resolved -----------------------------------------------------------
+  - id: q-001
+    text: "GBP/USD closes above 1.27 on 31 Jan 2026"
+    category: fx
+    created: 2026-01-05
+    resolves: 2026-01-31
+    resolution: { type: manual, note: "BoE daily spot, 16:00 fix" }
+    forecasts: { you: 0.85, claude: 0.74 }
+    outcome: 1
+
+  - id: q-002
+    text: "FTSE 100 closes above 8,200 on 30 Jan 2026"
+    category: equities
+    created: 2026-01-05
+    resolves: 2026-01-30
+    resolution: { type: manual, note: "LSE official close" }
+    forecasts: { you: 0.70, claude: 0.74 }
+    outcome: 1
+
+  - id: q-003
+    text: "UK CPI for December prints at or above 3.0% YoY"
+    category: macro
+    created: 2026-01-08
+    resolves: 2026-01-21
+    resolution: { type: manual, note: "ONS release" }
+    forecasts: { you: 0.60, claude: 0.70 }
+    outcome: 0
+
+  - id: q-004
+    text: "Arsenal beat Manchester City (Premier League, 2 Feb 2026)"
+    category: football
+    created: 2026-01-20
+    resolves: 2026-02-02
+    resolution: { type: manual, note: "Full-time result" }
+    forecasts: { you: 0.55, claude: 0.58 }
+    outcome: 1
+
+  - id: q-005
+    text: "EUR/GBP stays below 0.86 for the whole of February"
+    category: fx
+    created: 2026-01-28
+    resolves: 2026-02-28
+    resolution: { type: manual, note: "No daily close >= 0.86" }
+    forecasts: { you: 0.90, claude: 0.58 }
+    outcome: 1
+
+  - id: q-006
+    text: "Bank of England cuts Bank Rate at the February MPC meeting"
+    category: macro
+    created: 2026-01-15
+    resolves: 2026-02-05
+    resolution: { type: manual, note: "MPC decision" }
+    forecasts: { you: 0.40, claude: 0.32 }
+    outcome: 0
+
+  - id: q-007
+    text: "S&P 500 sets a new all-time high during February"
+    category: equities
+    created: 2026-01-30
+    resolves: 2026-02-28
+    resolution: { type: manual, note: "Intraday or close ATH" }
+    forecasts: { you: 0.75, claude: 0.32 }
+    outcome: 0
+
+  - id: q-008
+    text: "I run a sub-22:00 parkrun 5k in February"
+    category: personal
+    created: 2026-02-01
+    resolves: 2026-02-28
+    resolution: { type: manual, note: "parkrun results page" }
+    forecasts: { you: 0.30, claude: 0.58 }
+    outcome: 0
+
+  - id: q-009
+    text: "US nonfarm payrolls (January) beat consensus"
+    category: macro
+    created: 2026-02-01
+    resolves: 2026-02-06
+    resolution: { type: manual, note: "BLS print vs survey median" }
+    forecasts: { you: 0.65, claude: 0.74 }
+    outcome: 1
+
+  - id: q-010
+    text: "USD/JPY trades above 155 at any point in February"
+    category: fx
+    created: 2026-02-02
+    resolves: 2026-02-28
+    resolution: { type: manual, note: "Any intraday print" }
+    forecasts: { you: 0.80, claude: 0.74 }
+    outcome: 1
+
+  - id: q-011
+    text: "Nvidia closes its earnings week up more than 5%"
+    category: equities
+    created: 2026-02-10
+    resolves: 2026-02-27
+    resolution: { type: manual, note: "Friday close vs prior Friday" }
+    forecasts: { you: 0.50, claude: 0.50 }
+    outcome: 0
+
+  - id: q-012
+    text: "ECB holds policy rates at the March meeting"
+    category: macro
+    created: 2026-02-20
+    resolves: 2026-03-12
+    resolution: { type: manual, note: "Governing Council decision" }
+    forecasts: { you: 0.20, claude: 0.32 }
+    outcome: 0
+
+  - id: q-013
+    text: "I submit my next OU TMA before its cut-off"
+    category: personal
+    created: 2026-02-15
+    resolves: 2026-03-05
+    resolution: { type: manual, note: "OU submission receipt" }
+    forecasts: { you: 0.95, claude: 0.58 }
+    outcome: 1
+
+  - id: q-014
+    text: "Liverpool win the 2025/26 Premier League title"
+    category: football
+    created: 2026-01-10
+    resolves: 2026-05-24
+    resolution: { type: manual, note: "Final table" }
+    forecasts: { you: 0.45, claude: 0.66 }
+    outcome: 1
+
+  - id: q-015
+    text: "UK enters a technical recession on the Q4/Q1 prints"
+    category: macro
+    created: 2026-02-12
+    resolves: 2026-05-15
+    resolution: { type: manual, note: "Two consecutive negative GDP quarters" }
+    forecasts: { you: 0.35, claude: 0.32 }
+    outcome: 0
+
+  - id: q-016
+    text: "GBP/USD closes Q1 above 1.30"
+    category: fx
+    created: 2026-02-01
+    resolves: 2026-03-31
+    resolution: { type: manual, note: "31 Mar close" }
+    forecasts: { you: 0.72, claude: 0.38 }
+    outcome: 1
+
+  # ---- open (awaiting their resolution date) ------------------------------
+  - id: q-017
+    text: "GBP/USD closes above 1.30 on 31 Jul 2026"
+    category: fx
+    created: 2026-06-10
+    resolves: 2026-07-31
+    resolution: { type: manual, note: "BoE daily spot, 16:00 fix" }
+    forecasts: { you: 0.58, claude: 0.55 }
+
+  - id: q-018
+    text: "FTSE 100 closes above 8,800 on 31 Jul 2026"
+    category: equities
+    created: 2026-06-10
+    resolves: 2026-07-31
+    resolution: { type: manual, note: "LSE official close" }
+    forecasts: { you: 0.47, claude: 0.50 }
+
+  - id: q-019
+    text: "I complete the TM358 first study unit by 15 Jul 2026"
+    category: personal
+    created: 2026-06-12
+    resolves: 2026-07-15
+    resolution: { type: manual, note: "Unit marked complete" }
+    forecasts: { you: 0.70, claude: 0.62 }
+
+  - id: q-020
+    text: "Bank of England cuts Bank Rate at the August MPC meeting"
+    category: macro
+    created: 2026-06-15
+    resolves: 2026-08-07
+    resolution: { type: manual, note: "MPC decision" }
+    forecasts: { you: 0.55, claude: 0.58 }
+
+  # ---- automatic resolution example (due, awaiting the resolver) ----------
+  # Demonstrates the http_json resolver: fetch a JSON document, walk `path`,
+  # compare against `threshold` with `op`. Reachable from the daily Action with
+  # no secret. Rename the repo path once you have pushed.
+  - id: q-021
+    text: "The dead-reckoning repo has at least 1 GitHub star by 20 Jun 2026"
+    category: meta
+    created: 2026-06-12
+    resolves: 2026-06-20
+    resolution:
+      type: http_json
+      url: "https://api.github.com/repos/nihilisticiconoclast/dead-reckoning"
+      path: "stargazers_count"
+      op: ">="
+      threshold: 1
+      note: "Resolved automatically against the GitHub REST API"
+    forecasts: { you: 0.65, claude: 0.55 }

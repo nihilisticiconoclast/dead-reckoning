@@ -1,0 +1,161 @@
+/* Dead Reckoning — page layout.
+   The locked identity (palette, type, hard edges) comes from the Tunnel
+   tokens.css, linked from the cuddly-lamp CDN in index.html. This file only
+   does two things: (1) bridge the dashboard's semantic variables onto the
+   canonical Tunnel tokens, and (2) lay out the page. No colours or typefaces
+   are invented here — they all resolve back to the Tunnel tokens. */
+
+:root {
+  /* ── bridge: dashboard contract  ->  Tunnel tokens ───────────────────────
+     "you" is the teal data line; the model is the warm contour line. The one
+     red --route is reserved for the seeded figure (the route through the
+     ridge), never used as a UI accent here. */
+  --route-you:        var(--incident);   /* teal  #3E7C8C — your committed line */
+  --route-model:      var(--contour);    /* brown #7A5C3E — the model's line     */
+  --route-you-soft:   color-mix(in srgb, var(--incident) 16%, transparent);
+  --route-model-soft: color-mix(in srgb, var(--contour)  16%, transparent);
+
+  /* ground + structure, all keyed off the chart-paper + ink tokens */
+  --ground:        var(--paper);
+  --ground-raised: color-mix(in srgb, var(--ink) 4%,  var(--paper));
+  --ground-sunk:   color-mix(in srgb, var(--ink) 9%,  var(--paper));
+  --hairline:      color-mix(in srgb, var(--contour) 34%, transparent);
+  --contour-bold:  color-mix(in srgb, var(--contour) 58%, transparent);
+  --grid:          color-mix(in srgb, var(--contour) 16%, transparent);
+
+  /* ink roles */
+  --ink-dim:   color-mix(in srgb, var(--ink) 72%, var(--paper));
+  --ink-faint: color-mix(in srgb, var(--ink) 48%, var(--paper));
+
+  /* outcomes — kept on-palette: a solid mark for a hit, a muted one for a miss */
+  --yes: var(--index);
+  --no:  color-mix(in srgb, var(--ink) 42%, var(--paper));
+
+  /* fonts (alias to the Tunnel families) */
+  --display: var(--font-display);
+  --mono:    var(--font-data);
+
+  /* type scale -> Tunnel steps */
+  --t-hero:  var(--step-4);
+  --t-h2:    var(--step-1);
+  --t-body:  var(--step-0);
+  --t-small: var(--step--1);
+  --t-micro: 0.7rem;
+
+  /* space + form */
+  --gap:  1.5rem;
+  --pad:  1.35rem;
+  --maxw: 1120px;
+  /* --radius stays 0 (hard edges), inherited from tokens.css */
+}
+
+/* shared page gutter — masthead, hero and every #app section align to this */
+.dr-wrap { max-width: var(--maxw); margin: 0 auto; padding: 0 1.25rem; }
+
+/* masthead ------------------------------------------------------------------ */
+.masthead {
+  display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+  border-bottom: var(--rule);
+  padding-top: 1.4rem; padding-bottom: 1rem;
+}
+.brand { display: flex; align-items: center; gap: 0.8rem; }
+.brand .sig { width: clamp(56px, 6vw, 84px); }
+.brand .wordmark {
+  font-family: var(--mono); font-size: 0.78rem; letter-spacing: 0.16em;
+  text-transform: uppercase; color: var(--contour); line-height: 1.35;
+}
+.masthead nav a { margin-left: 1.3rem; font-family: var(--mono); font-size: 0.8rem; }
+
+/* hero ---------------------------------------------------------------------- */
+.hero { padding-top: clamp(2.4rem, 6vw, 4.4rem); padding-bottom: 0.6rem; }
+.hero h1 {
+  font-family: var(--display); font-weight: 560; font-size: var(--t-hero);
+  line-height: 1.02; letter-spacing: -0.01em; margin: 0.1rem 0 0.6rem;
+}
+.hero .thesis { max-width: 56ch; margin: 0; }
+
+/* section rhythm ------------------------------------------------------------ */
+main#app { display: block; }
+main#app > section { max-width: var(--maxw); margin: 0 auto; padding: 2.6rem 1.25rem 0; }
+main#app > .rule   { max-width: var(--maxw); margin: 2.6rem auto 0; }
+main#app > footer  { max-width: var(--maxw); margin: 0 auto; padding: 1.6rem 1.25rem 3rem; }
+
+h2.section {
+  font-family: var(--display); font-weight: 560; font-size: var(--t-h2);
+  letter-spacing: -0.005em; margin: 0 0 1.1rem; color: var(--ink);
+}
+
+/* panels — flat, hard-edged, a touch darker than the page (no cards/shadows) */
+.panel {
+  background: var(--ground-raised);
+  border: 1px solid var(--hairline);
+  border-radius: 0;
+  padding: var(--pad);
+}
+.mono  { font-family: var(--mono); }
+.dim   { color: var(--ink-dim); }
+.faint { color: var(--ink-faint); }
+
+/* scoreboard ---------------------------------------------------------------- */
+.standing {
+  display: grid; grid-template-columns: 1fr auto 1fr 1.2fr;
+  align-items: center; gap: var(--gap);
+}
+.score-card { background: var(--ground-raised); border: 1px solid var(--hairline); padding: 1.1rem 1.2rem; }
+.score-brier { font-family: var(--display); font-size: 2.7rem; line-height: 1; margin-top: 0.5rem; color: var(--ink); }
+.score-sub { font-size: var(--t-micro); margin-top: 0.25rem; }
+.score-row { display: flex; gap: 1.2rem; margin-top: 0.9rem; font-size: var(--t-small); }
+.versus { font-size: var(--t-small); text-align: center; }
+.score-meta { padding-left: 0.4rem; font-size: var(--t-small); line-height: 1.9; }
+.score-meta .figure { font-family: var(--display); font-size: 1.1rem; color: var(--ink); }
+
+/* two-column ---------------------------------------------------------------- */
+.grid-2 { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr); gap: var(--gap); align-items: start; }
+
+/* plots --------------------------------------------------------------------- */
+.plot { margin: 0; }
+.plot svg { width: 100%; height: auto; display: block; }
+.plot.wide svg { max-height: 280px; }
+figcaption { margin-top: 0.7rem; font-size: var(--t-small); color: var(--ink-dim); }
+.ax   { fill: var(--ink-faint); font-family: var(--mono); font-size: 10px; }
+.ax-t { fill: var(--ink-dim);   font-family: var(--mono); font-size: 10px; letter-spacing: 0.03em; }
+
+/* readout / prose ----------------------------------------------------------- */
+.readout { padding-top: 0.4rem; }
+.lede { color: var(--ink-dim); margin: 0 0 1rem; }
+.lede .mono { color: var(--ink); }
+.key { list-style: none; padding: 0; margin: 0; display: flex; gap: 1.4rem; font-size: var(--t-small); }
+.key li { display: flex; align-items: center; gap: 0.5rem; }
+.dot { width: 11px; height: 11px; display: inline-block; }
+
+/* decomposition ------------------------------------------------------------- */
+table.decomp { width: 100%; border-collapse: collapse; }
+table.decomp th, table.decomp td { text-align: left; padding: 0.55rem 0.6rem; border-bottom: 1px solid var(--hairline); vertical-align: middle; }
+table.decomp thead th { font-family: var(--mono); font-size: var(--t-micro); letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-faint); border-bottom-color: var(--contour-bold); }
+table.decomp tbody th { font-weight: 400; font-size: var(--t-small); color: var(--ink); }
+table.decomp td.mono { width: 4.5rem; }
+table.decomp tr.sum th, table.decomp tr.sum td { border-bottom: none; padding-top: 0.8rem; color: var(--ink); }
+.meter { display: block; width: 96px; height: 6px; background: var(--ground-sunk); overflow: hidden; }
+.meter > span { display: block; height: 100%; }
+
+/* ledgers ------------------------------------------------------------------- */
+table.ledger { width: 100%; border-collapse: collapse; font-size: var(--t-small); }
+table.ledger th, table.ledger td { text-align: left; padding: 0.5rem 0.7rem; border-bottom: 1px solid var(--hairline); }
+table.ledger thead th { font-family: var(--mono); font-size: var(--t-micro); letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-faint); border-bottom-color: var(--contour-bold); white-space: nowrap; }
+table.ledger tbody tr:hover { background: var(--ground-sunk); }
+table.ledger td.id { color: var(--ink-dim); white-space: nowrap; }
+table.ledger td.mono.lead { color: var(--route-you); }
+.cat { font-size: var(--t-micro); letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-faint); border: 1px solid var(--contour-bold); padding: 0.05rem 0.35rem; white-space: nowrap; }
+
+/* responsive ---------------------------------------------------------------- */
+@media (max-width: 860px) {
+  .grid-2 { grid-template-columns: 1fr; }
+  .standing { grid-template-columns: 1fr 1fr; }
+  .versus { display: none; }
+  .score-meta { grid-column: 1 / -1; padding-left: 0; }
+}
+@media (max-width: 560px) {
+  .standing { grid-template-columns: 1fr; }
+  .panel { overflow-x: auto; }
+  table.ledger { min-width: 460px; }
+}

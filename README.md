@@ -24,9 +24,13 @@ validation harness you can actually look at.
 - A running cumulative-Brier track, plus open positions, due-but-unresolved
   questions, and the resolved log.
 
-The hero figure is seeded contour terrain with a route that follows the valley and
-then tunnels straight through the ridge — the Tunnel aesthetic. Swap `docs/tokens.css`
-for your own and the rest inherits.
+The look is the in-house **Tunnel** aesthetic — chart-paper palette, Fraunces /
+Public Sans / IBM Plex Mono, hard edges, and the contour-map signature (a route
+that follows the valley and tunnels through the ridge). The locked layer
+(`tokens.css`) and the seeded figure (`tunnel-figure.js`) are **linked from the
+`cuddly-lamp` CDN, not vendored**, so a house-style update there reaches this page
+automatically; `docs/app.css` only bridges the dashboard's variables onto those
+tokens and lays out the page.
 
 ## Go live (4 steps)
 
@@ -87,7 +91,10 @@ python3 -m http.server 8000 --directory docs   # then open http://localhost:8000
 ```
 
 Serve `docs/` over HTTP rather than opening `index.html` from disk — the page
-fetches `data.json`. With Claude Code, the `reckon` skill does all three steps.
+fetches `data.json`. The Tunnel `tokens.css` and `tunnel-figure.js` load from the
+`cuddly-lamp` CDN, so local preview needs network for the styling and the contour
+signature (the dashboard itself still renders without them). With Claude Code, the
+`reckon` skill does all three steps.
 
 ## Layout
 
@@ -96,7 +103,8 @@ data/questions.yml          source of truth (hand-edited; comments matter)
 R/score.R                   scoring engine  → docs/data.json   (no network)
 R/resolve.R                 auto-resolver for http_json questions
 R/forecast_claude.R         optional model rival (needs ANTHROPIC_API_KEY)
-docs/                       the Pages site; only data.json changes nightly
+docs/index.html             the Pages site; links Tunnel tokens.css + tunnel-figure.js (CDN)
+docs/app.css  docs/app.js   dashboard layout + renderer; data.json changes nightly
 .github/workflows/daily.yml the heartbeat: resolve → score → commit
 CLAUDE.md                   guide for Claude Code
 ```
