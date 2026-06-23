@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-22T14:55:00Z",
+  "generated_at": "2026-06-23T09:35:04Z",
   "counts": {
     "resolved": 0,
     "open": 19,
@@ -13,8 +13,8 @@
       "brier": null,
       "logloss": null,
       "bss": null,
-      "reliability": null,
-      "resolution": null,
+      "reliability": 0,
+      "resolution": 0,
       "uncertainty": null
     },
     "claude": {
@@ -23,8 +23,8 @@
       "brier": null,
       "logloss": null,
       "bss": null,
-      "reliability": null,
-      "resolution": null,
+      "reliability": 0,
+      "resolution": 0,
       "uncertainty": null
     }
   },
