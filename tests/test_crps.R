@@ -100,8 +100,8 @@ all_pass <- pass("Quantile CRPS: dense quantiles ~ Gaussian (mu=0, sigma=1, y=0)
 # integral = 2 * (0.5 * (ql + ql)/2 + 0.5 * (ql + ql)/2) = 2 * (0.5 * ql) = ql
 # So CRPS = ql = 0.5 * |q - y|
 q <- 1; y <- 2
-manual_ql <- 0.5 * abs(q - y)
-all_pass <- pass("Quantile CRPS: single quantile (tau=0.5) => 0.5 * |q - y|",
+manual_ql <- abs(q - y)  # CRPS = 2*int(QL); lone median => point-forecast |q-y|
+all_pass <- pass("Quantile CRPS: single quantile (tau=0.5) => |q - y|",
                  abs(crps_quantiles(0.5, q, y) - manual_ql) < TOL) && all_pass
 
 # ---- 4. PIT (Probability Integral Transform) ------------------------------------

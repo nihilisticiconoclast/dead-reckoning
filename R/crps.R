@@ -31,8 +31,8 @@ crps_sample <- function(x, y) {
   if (m == 0) return(NA_real_)
   if (m == 1) return(abs(x - y))
   i <- seq_len(m)                                  # 1-based index
-  pair_mean <- 2 * sum((2 * i - m - 1) * x) / (m * m)   # = mean_{i,j}|x_i - x_j|
-  mean(abs(x - y)) - 0.5 * pair_mean
+  pair_sum <- 2 * sum((2 * i - m - 1) * x)              # = sum_{i,j} |x_i - x_j|
+  mean(abs(x - y)) - pair_sum / (2 * m * (m - 1))       # fair (unbiased) estimator
 }
 
 # ---- Predictive quantiles (approximate) --------------------------------------
