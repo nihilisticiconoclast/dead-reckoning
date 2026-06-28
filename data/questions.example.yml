@@ -1,0 +1,112 @@
+# Dead Reckoning — EXAMPLE ledger (not your real one)
+# ---------------------------------------------------
+# A small, fully-resolved fixture for exercising the scoring pipeline end to end,
+# including the continuous (CRPS) path. It does not touch data/questions.yml.
+#
+#   DR_QUESTIONS=data/questions.example.yml DR_OUT=/tmp/dr-demo.json Rscript R/score.R
+#   DR_OUT=/tmp/dr-demo.json LANGFUSE_DRY_RUN=1 Rscript R/push_scores.R
+#
+# Expected (cross-checked numerically):
+#   binary  you    Brier 0.1050  logloss 0.3635  BSS 0.58
+#   binary  claude Brier 0.1775  logloss 0.5445  BSS 0.29
+#   contin. you    CRPSS 0.3530   |  claude CRPSS 0.1836   (equal-weight skill)
+
+questions:
+
+  # ---- binary (Brier / Murphy) ----------------------------------------------
+  - id: q-b1
+    text: "Example binary 1"
+    category: fx
+    created: 2026-01-01
+    resolves: 2026-03-01
+    resolution: { type: manual, note: "fixture" }
+    forecasts: { you: 0.70, claude: 0.60 }
+    outcome: 1
+
+  - id: q-b2
+    text: "Example binary 2"
+    category: fx
+    created: 2026-01-01
+    resolves: 2026-03-02
+    resolution: { type: manual, note: "fixture" }
+    forecasts: { you: 0.30, claude: 0.40 }
+    outcome: 0
+
+  - id: q-b3
+    text: "Example binary 3"
+    category: equities
+    created: 2026-01-01
+    resolves: 2026-03-03
+    resolution: { type: manual, note: "fixture" }
+    forecasts: { you: 0.80, claude: 0.55 }
+    outcome: 1
+
+  - id: q-b4
+    text: "Example binary 4"
+    category: equities
+    created: 2026-01-01
+    resolves: 2026-03-04
+    resolution: { type: manual, note: "fixture" }
+    forecasts: { you: 0.20, claude: 0.45 }
+    outcome: 0
+
+  - id: q-b5
+    text: "Example binary 5"
+    category: macro
+    created: 2026-01-01
+    resolves: 2026-03-05
+    resolution: { type: manual, note: "fixture" }
+    forecasts: { you: 0.60, claude: 0.50 }
+    outcome: 0
+
+  - id: q-b6
+    text: "Example binary 6"
+    category: macro
+    created: 2026-01-01
+    resolves: 2026-03-06
+    resolution: { type: manual, note: "fixture" }
+    forecasts: { you: 0.90, claude: 0.70 }
+    outcome: 1
+
+  # ---- continuous (CRPS) -----------------------------------------------------
+  - id: q-c1
+    text: "Example continuous 1 (USD/JPY level)"
+    category: fx
+    type: continuous
+    units: "JPY per USD"
+    created: 2026-01-01
+    resolves: 2026-03-07
+    resolution: { type: manual, note: "fixture" }
+    reference: { mu: 150, sigma: 12 }
+    forecasts:
+      you:    { mu: 150, sigma: 6 }
+      claude: { mu: 149, sigma: 8 }
+    outcome: 151.2
+
+  - id: q-c2
+    text: "Example continuous 2 (GBP/USD level)"
+    category: fx
+    type: continuous
+    units: "USD per GBP"
+    created: 2026-01-01
+    resolves: 2026-03-08
+    resolution: { type: manual, note: "fixture" }
+    reference: { mu: 1.30, sigma: 0.06 }
+    forecasts:
+      you:    { mu: 1.30, sigma: 0.03 }
+      claude: { mu: 1.31, sigma: 0.05 }
+    outcome: 1.285
+
+  - id: q-c3
+    text: "Example continuous 3 (FTSE 100 level)"
+    category: equities
+    type: continuous
+    units: "index points"
+    created: 2026-01-01
+    resolves: 2026-03-09
+    resolution: { type: manual, note: "fixture" }
+    reference: { mu: 9000, sigma: 800 }
+    forecasts:
+      you:    { mu: 9000, sigma: 400 }
+      claude: { mu: 9100, sigma: 500 }
+    outcome: 9300

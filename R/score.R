@@ -29,7 +29,10 @@ bin_of <- function(p) pmin(as.integer(p * 10), 9L)   # [0,.1) .. [.9,1]; p==1 ->
 round4 <- function(x) round(x, 4)
 
 # ---- load --------------------------------------------------------------------
-q <- yaml::read_yaml("data/questions.yml")$questions
+# Paths are env-overridable so you can score an example ledger to a throwaway
+# output without clobbering the real one (see data/questions.example.yml).
+QSRC <- Sys.getenv("DR_QUESTIONS", "data/questions.yml")
+q <- yaml::read_yaml(QSRC)$questions
 
 field <- function(item, ...) {
   path <- c(...); v <- item
@@ -39,20 +42,27 @@ field <- function(item, ...) {
 
 rows <- lapply(q, function(it) {
   list(
-    id       = it$id,
-    text     = it$text,
-    category = it$category %||% "uncategorised",
-    resolves = as.Date(as.character(it$resolves)),
-    you      = field(it, "forecasts", "you"),
-    claude   = field(it, "forecasts", "claude") %||% NA_real_,
-    outcome  = if (is.null(it$outcome)) NA_integer_ else as.integer(it$outcome),
-    hint     = field(it, "resolution", "type") %||% "manual"
+    id        = it$id,
+    text      = it$text,
+    category  = it$category %||% "uncategorised",
+    type      = it$type %||% "binary",     # yes/no unless the block declares continuous
+    units     = it$units %||% NA_character_,
+    resolves  = as.Date(as.character(it$resolves)),
+    you       = field(it, "forecasts", "you"),
+    claude    = field(it, "forecasts", "claude") %||% NA_real_,
+    reference = it$reference,               # optional climatology for the CRPS skill score
+    outcome   = if (is.null(it$outcome)) NA_real_ else as.numeric(it$outcome),
+    hint      = field(it, "resolution", "type") %||% "manual"
   )
 })
 
-is_resolved <- function(r) !is.na(r$outcome) && r$outcome %in% c(0L, 1L)
-resolved <- Filter(is_resolved, rows)
-pending  <- Filter(function(r) !is_resolved(r), rows)
+# The binary engine below scores yes/no questions only. Continuous questions
+# (numeric outcome) are routed out here and scored with CRPS in
+# R/score_continuous.R, so the existing dashboard fields stay binary-meaningful.
+is_resolved <- function(r) identical(r$type, "binary") && !is.na(r$outcome) && r$outcome %in% c(0, 1)
+binary   <- Filter(function(r) identical(r$type, "binary"), rows)
+resolved <- Filter(is_resolved, binary)
+pending  <- Filter(function(r) !is_resolved(r), binary)
 awaiting <- Filter(function(r) r$resolves <= TODAY, pending)
 openq    <- Filter(function(r) r$resolves >  TODAY, pending)
 
@@ -135,24 +145,4 @@ out <- list(
   generated_at = format(as.POSIXlt(Sys.time(), tz = "UTC"), "%Y-%m-%dT%H:%M:%SZ"),
   counts = list(resolved = length(resolved), open = length(openq),
                 awaiting = length(awaiting)),
-  base_rate = round4(if (length(resolved)) mean(vapply(resolved, function(r) r$outcome, 0L)) else NA),
-  forecasters = forecasters,
-  calibration = calibration,
-  timeseries = timeseries,
-  resolved = resolved_out,
-  open = open_out,
-  awaiting = awaiting_out
-)
-
-if (!dir.exists("docs")) dir.create("docs")
-writeLines(
-  jsonlite::toJSON(out, auto_unbox = TRUE, pretty = TRUE, null = "null", na = "null"),
-  "docs/data.json"
-)
-cat(sprintf("Scored %d resolved | %d open | %d awaiting\n",
-            length(resolved), length(openq), length(awaiting)))
-for (k in FORECASTERS) {
-  f <- forecasters[[k]]
-  cat(sprintf("  %-6s Brier=%.4f  logloss=%.4f  BSS=%.4f  rel=%.4f  res=%.4f\n",
-              f$label, f$brier, f$logloss, f$bss, f$reliability, f$resolution))
-}
+  base_rate = rou

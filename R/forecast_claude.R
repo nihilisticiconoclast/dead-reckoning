@@ -17,7 +17,13 @@ key <- Sys.getenv("ANTHROPIC_API_KEY")
 if (!nzchar(key)) { cat("No ANTHROPIC_API_KEY; skipping model forecasts.\n"); quit(save = "no") }
 suppressMessages(library(httr2))
 
-MODEL <- Sys.getenv("DR_MODEL", "claude-sonnet-4-6")
+# Optional Langfuse observability: traces each model forecast (prompt version,
+# raw response, tokens, latency). No-ops without LANGFUSE_* env vars, so this is
+# a safe add to the nightly Action. See R/langfuse.R.
+if (file.exists("R/langfuse.R")) source("R/langfuse.R")
+
+MODEL          <- Sys.getenv("DR_MODEL", "claude-sonnet-4-6")
+PROMPT_VERSION <- "dr-forecast-v1"   # bump when you change SYSTEM, to compare calibration by version
 SRC   <- "data/questions.yml"
 TODAY <- Sys.Date()
 `%||%` <- function(x, y) if (is.null(x) || length(x) == 0) y else x
@@ -29,23 +35,34 @@ SYSTEM <- paste(
   "a single decimal between 0.01 and 0.99, no other text."
 )
 
+# Returns a list so the caller can both write the number into the ledger and log
+# the full generation (raw text, usage, latency) to Langfuse.
 ask <- function(question, resolves) {
+  user <- sprintf("Question: %s\nResolves: %s\nProbability TRUE:", question, resolves)
   body <- list(
     model = MODEL, max_tokens = 16,
     system = SYSTEM,
-    messages = list(list(role = "user",
-      content = sprintf("Question: %s\nResolves: %s\nProbability TRUE:", question, resolves)))
+    messages = list(list(role = "user", content = user))
   )
+  started <- Sys.time()
   resp <- request("https://api.anthropic.com/v1/messages") |>
     req_headers("x-api-key" = key, "anthropic-version" = "2023-06-01",
                 "content-type" = "application/json") |>
     req_body_json(body) |>
     req_retry(max_tries = 3) |>
     req_perform()
-  txt <- resp_body_json(resp)$content[[1]]$text
+  ended  <- Sys.time()
+  parsed <- resp_body_json(resp)
+  txt <- parsed$content[[1]]$text
   p <- suppressWarnings(as.numeric(regmatches(txt, regexpr("0?\\.[0-9]+|[01]", txt))))
   if (is.na(p)) stop("could not parse probability from: ", txt)
-  round(min(max(p, 0.01), 0.99), 2)
+  u <- parsed$usage %||% list()
+  list(
+    p = round(min(max(p, 0.01), 0.99), 2), raw = txt, user = user,
+    usage = list(input  = u$input_tokens  %||% NA, output = u$output_tokens %||% NA,
+                 total  = (u$input_tokens %||% 0) + (u$output_tokens %||% 0), unit = "TOKENS"),
+    started = started, ended = ended
+  )
 }
 
 # insert ", claude: Y" into a flow-style forecasts line lacking claude
@@ -53,27 +70,4 @@ patch_forecast <- function(text, id, p) {
   pat <- sprintf("(?s)(  - id:\\s*%s\\b.*?)(?=(\\n  - id:|\\Z))", id)
   m <- regmatches(text, regexpr(pat, text, perl = TRUE))
   if (!length(m)) return(text)
-  block <- m[[1]]
-  if (grepl("claude:", block)) return(text)
-  patched <- sub("(forecasts:\\s*\\{[^}]*?)(\\s*\\})",
-                 sprintf("\\1, claude: %.2f\\2", p), block, perl = TRUE)
-  sub(pat, patched, text, perl = TRUE)
-}
-
-text <- paste(readLines(SRC, warn = FALSE), collapse = "\n")
-q <- yaml::read_yaml(SRC)$questions
-
-n <- 0
-for (it in q) {
-  if (!is.null(it$outcome)) next
-  if (as.Date(as.character(it$resolves)) <= TODAY) next     # open only
-  if (!is.null(it$forecasts$claude)) next                   # already committed
-  p <- tryCatch(ask(it$text, it$resolves),
-                error = function(e) { message(sprintf("  skip %s: %s", it$id, conditionMessage(e))); NA })
-  if (is.na(p)) next
-  text <- patch_forecast(text, it$id, p)
-  n <- n + 1
-  cat(sprintf("  %s  model p = %.2f\n", it$id, p))
-}
-if (n > 0) writeLines(text, SRC)
-cat(sprintf("Registered %d model forecast(s)\n", n))
+  block <
