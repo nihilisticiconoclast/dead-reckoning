@@ -1,5 +1,5 @@
 #!/usr/bin/env Rscript
-# Dead Reckoning — model rival (optional)
+# Dead Reckoning  model rival (optional)
 # ---------------------------------------
 # For every OPEN question that does not yet carry a committed `claude:` forecast,
 # ask the Anthropic API for a probability and write it back into questions.yml.
@@ -70,4 +70,53 @@ patch_forecast <- function(text, id, p) {
   pat <- sprintf("(?s)(  - id:\\s*%s\\b.*?)(?=(\\n  - id:|\\Z))", id)
   m <- regmatches(text, regexpr(pat, text, perl = TRUE))
   if (!length(m)) return(text)
-  block <
+  block <- m[[1]]
+  if (grepl("claude:", block)) return(text)
+  patched <- sub("(forecasts:\\s*\\{[^}]*?)(\\s*\\})",
+                 sprintf("\\1, claude: %.2f\\2", p), block, perl = TRUE)
+  sub(pat, patched, text, perl = TRUE)
+}
+
+text <- paste(readLines(SRC, warn = FALSE), collapse = "\n")
+q <- yaml::read_yaml(SRC)$questions
+
+n <- 0
+for (it in q) {
+  if (!is.null(it$outcome)) next
+  if (as.Date(as.character(it$resolves)) <= TODAY) next     # open only
+  if (!is.null(it$forecasts$claude)) next                   # already committed
+  result <- tryCatch(
+    ask(it$text, it$resolves),
+    error = function(e) { message(sprintf("  skip %s: %s", it$id, conditionMessage(e))); NULL }
+  )
+  if (is.null(result)) next
+  
+  # Log to Langfuse (no-op if LANGFUSE_* env vars are missing or LANGFUSE_DRY_RUN=1)
+  if (exists("lf_log_forecast")) {
+    tryCatch(
+      lf_log_forecast(
+        question_id = it$id,
+        text = it$text,
+        category = it$category %||% "uncategorised",
+        resolves = it$resolves,
+        forecaster = "claude",
+        model = MODEL,
+        system_prompt = SYSTEM,
+        user_content = result$user,
+        raw_text = result$raw,
+        prob = result$p,
+        prompt_version = PROMPT_VERSION,
+        usage = result$usage,
+        started = result$started,
+        ended = result$ended
+      ),
+      error = function(e) { message(sprintf("  [langfuse] failed for %s: %s", it$id, conditionMessage(e))) }
+    )
+  }
+  
+  text <- patch_forecast(text, it$id, result$p)
+  n <- n + 1
+  cat(sprintf("  %s  model p = %.2f\n", it$id, result$p))
+}
+if (n > 0) writeLines(text, SRC)
+cat(sprintf("Registered %d model forecast(s)\n", n))
