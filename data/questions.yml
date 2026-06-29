@@ -191,3 +191,139 @@ questions:
     resolves: 2026-09-30
     resolution: { type: manual, note: "Self-reported; any night spent away from home" }
     forecasts: { you: 0.99, claude: 0.82 }
+
+  # ---- continuous (CRPS) --------------------------------------------------
+  # These forecast a *number*, not a yes/no event. Each forecaster gives a
+  # predictive distribution — { mu, sigma } here — and the question resolves
+  # with the realised value (add `outcome: <number>`). `reference` is the
+  # climatology the CRPS skill score (CRPSS) is measured against. `you:` is left
+  # empty for you to commit your own distribution before each resolves date.
+  - id: q-020
+    text: "GBP/USD daily spot rate on 30 Sep 2026"
+    category: fx
+    type: continuous
+    units: "USD per GBP"
+    created: 2026-06-29
+    resolves: 2026-09-30
+    resolution: { type: manual, note: "Bank of England daily spot, 16:00 fix" }
+    reference: { mu: 1.31, sigma: 0.05 }
+    forecasts:
+      you:
+      claude: { mu: 1.30, sigma: 0.035 }
+
+  - id: q-021
+    text: "EUR/USD reference rate on 31 Dec 2026"
+    category: fx
+    type: continuous
+    units: "USD per EUR"
+    created: 2026-06-29
+    resolves: 2026-12-31
+    resolution: { type: manual, note: "ECB euro reference exchange rate" }
+    reference: { mu: 1.14, sigma: 0.05 }
+    forecasts:
+      you:
+      claude: { mu: 1.13, sigma: 0.04 }
+
+  - id: q-022
+    text: "FTSE 100 official close on 30 Sep 2026"
+    category: equities
+    type: continuous
+    units: "index points"
+    created: 2026-06-29
+    resolves: 2026-09-30
+    resolution: { type: manual, note: "LSE official close" }
+    reference: { mu: 9000, sigma: 700 }
+    forecasts:
+      you:
+      claude: { mu: 9050, sigma: 450 }
+
+  - id: q-023
+    text: "S&P 500 closing level on 31 Dec 2026"
+    category: equities
+    type: continuous
+    units: "index points"
+    created: 2026-06-29
+    resolves: 2026-12-31
+    resolution: { type: manual, note: "Official close, 31 Dec 2026" }
+    reference: { mu: 6400, sigma: 850 }
+    forecasts:
+      you:
+      claude: { mu: 6700, sigma: 550 }
+
+  - id: q-024
+    text: "UK headline CPI inflation (YoY) for the September 2026 print, in percent"
+    category: macro
+    type: continuous
+    units: "percent"
+    created: 2026-06-29
+    resolves: 2026-10-21
+    resolution: { type: manual, note: "ONS consumer price inflation release" }
+    reference: { mu: 2.8, sigma: 1.0 }
+    forecasts:
+      you:
+      claude: { mu: 2.6, sigma: 0.5 }
+
+  - id: q-025
+    text: "US headline CPI inflation (YoY) for the December 2026 print, in percent"
+    category: macro
+    type: continuous
+    units: "percent"
+    created: 2026-06-29
+    resolves: 2027-01-13
+    resolution: { type: manual, note: "BLS CPI release (Dec print lands Jan 2027)" }
+    reference: { mu: 2.7, sigma: 0.9 }
+    forecasts:
+      you:
+      claude: { mu: 2.5, sigma: 0.5 }
+
+  - id: q-026
+    text: "Bank of England Bank Rate after the December 2026 MPC meeting, in percent"
+    category: macro
+    type: continuous
+    units: "percent"
+    created: 2026-06-29
+    resolves: 2026-12-17
+    resolution: { type: manual, note: "MPC decision" }
+    reference: { mu: 3.75, sigma: 0.6 }
+    forecasts:
+      you:
+      claude: { mu: 3.75, sigma: 0.35 }
+
+  - id: q-027
+    text: "Liverpool's final points total in the 2026/27 Premier League"
+    category: football
+    type: continuous
+    units: "points"
+    created: 2026-06-29
+    resolves: 2027-05-30
+    resolution: { type: manual, note: "Final league table" }
+    reference: { mu: 74, sigma: 10 }
+    forecasts:
+      you:
+      claude: { mu: 78, sigma: 7 }
+
+  - id: q-028
+    text: "Number of parkruns (5k) I complete in Q3 2026 (Jul–Sep)"
+    category: personal
+    type: continuous
+    units: "runs"
+    created: 2026-06-29
+    resolves: 2026-09-30
+    resolution: { type: manual, note: "parkrun results page" }
+    reference: { mu: 5, sigma: 5 }
+    forecasts:
+      you:
+      claude: { mu: 6, sigma: 3 }
+
+  - id: q-029
+    text: "Number of resolved forecasts in this log on 31 Dec 2026"
+    category: meta
+    type: continuous
+    units: "forecasts"
+    created: 2026-06-29
+    resolves: 2026-12-31
+    resolution: { type: manual, note: "Count of questions carrying an outcome on 31 Dec 2026" }
+    reference: { mu: 12, sigma: 8 }
+    forecasts:
+      you:
+      claude: { mu: 18, sigma: 5 }

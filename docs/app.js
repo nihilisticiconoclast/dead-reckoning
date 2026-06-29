@@ -277,6 +277,134 @@
       '</div></section>';
   }
 
+  // ---- continuous (CRPS) ----------------------------------------------------
+  // Scale-aware number format: continuous outcomes range from fx rates near 1 to
+  // index levels in the thousands, so fixed decimals won't do.
+  function fnum(x) {
+    if (x == null || isNaN(x)) return '—';
+    var a = Math.abs(x);
+    if (a >= 1000) return Math.round(x).toLocaleString('en-GB');
+    if (a >= 100)  return x.toFixed(0);
+    if (a >= 10)   return x.toFixed(1);
+    if (a >= 1)    return x.toFixed(2);
+    return x.toFixed(3);
+  }
+  function dist(f) {                                   // { mu, sigma } -> "1.30 ± 0.04"
+    if (!f || f.mu == null || isNaN(f.mu)) return '—';
+    return fnum(f.mu) + ((f.sigma == null || isNaN(f.sigma)) ? '' : ' ± ' + fnum(f.sigma));
+  }
+
+  // PIT histogram: where each outcome fell in its predictive CDF. Flat = honest
+  // spread; ∪ = over-confident (too narrow); ∩ = under-confident (too wide).
+  function pitHistogram(c) {
+    var W = 336, H = 168, ML = 26, MR = 10, MT = 14, MB = 28;
+    var PW = W - ML - MR, PH = H - MT - MB;
+    var you = c.pit.you || [], cl = c.pit.claude || [];
+    var maxN = 1, sumYou = 0;
+    you.forEach(function (n) { maxN = Math.max(maxN, n); sumYou += n; });
+    cl.forEach(function (n) { maxN = Math.max(maxN, n); });
+    var bw = PW / 10;
+    var X = function (k) { return ML + k * bw; };
+    var Y = function (n) { return MT + PH - (n / maxN) * PH; };
+    var s = '<svg viewBox="0 0 ' + W + ' ' + H + '" role="img" ' +
+      'aria-label="PIT histogram: where outcomes fell in their predictive distribution">';
+    s += '<line x1="' + ML + '" y1="' + (MT + PH) + '" x2="' + (ML + PW) + '" y2="' + (MT + PH) +
+      '" style="stroke:var(--hairline)"/>';
+    if (sumYou) {                                      // uniform (calibrated) reference
+      var ey = Y(sumYou / 10);
+      s += '<line x1="' + ML + '" y1="' + ey + '" x2="' + (ML + PW) + '" y2="' + ey +
+        '" style="stroke:var(--ink-faint)" stroke-dasharray="2 4"/>';
+      s += '<text x="' + (ML + PW) + '" y="' + (ey - 4) + '" class="ax" text-anchor="end">flat = calibrated</text>';
+    }
+    function bars(arr, color, off) {
+      var g = '';
+      arr.forEach(function (n, k) {
+        g += '<rect x="' + (X(k) + off) + '" y="' + Y(n) + '" width="' + (bw / 2 - 1).toFixed(1) +
+          '" height="' + ((n / maxN) * PH).toFixed(1) + '" style="fill:' + color + ';fill-opacity:.8"/>';
+      });
+      return g;
+    }
+    s += bars(you, YOU, 1) + bars(cl, MODEL, bw / 2);
+    [0, 0.5, 1].forEach(function (t) {
+      s += '<text x="' + (ML + t * PW) + '" y="' + (H - 9) + '" class="ax" text-anchor="middle">' + t.toFixed(1) + '</text>';
+    });
+    s += '<text x="' + (ML + PW / 2) + '" y="' + (H - 9 + 0) + '" class="ax-t" text-anchor="middle" dy="14">PIT</text>';
+    s += '</svg>';
+    return s;
+  }
+
+  function continuousSection(d) {
+    var c = d.continuous;
+    if (!c) return '';
+    var html = '<section><div class="eyebrow">Continuous · CRPS</div>' +
+      '<h2 class="section">Forecasts of a number, not a yes/no</h2>';
+
+    if (c.n > 0) {
+      var y = c.forecasters.you, m = c.forecasters.claude;
+      var youLeads = (y.crpss || 0) >= (m.crpss || 0);
+      function card(f, color, leads) {
+        return '<div class="score-card" style="border-top:2px solid ' + color + '">' +
+          '<div class="eyebrow" style="color:' + color + '">' + esc(f.label) +
+            (leads ? ' · leading' : '') + '</div>' +
+          '<div class="score-brier mono">' + f3(f.crpss) + '</div>' +
+          '<div class="score-sub mono dim">CRPSS · skill vs climatology · higher is better</div>' +
+          '<div class="score-row mono">' +
+            '<span><span class="faint">mean CRPS</span> ' + fnum(f.crps) + '</span>' +
+            '<span class="faint">' + f.n + ' resolved · mixed units</span>' +
+          '</div></div>';
+      }
+      html += '<div class="grid-2">' +
+        '<section class="standing">' + card(y, YOU, youLeads) +
+          '<div class="versus mono faint">vs</div>' + card(m, MODEL, !youLeads) + '</section>' +
+        '<figure class="panel plot">' + pitHistogram(c) +
+          '<figcaption class="dim">Each resolved outcome dropped into one of ten CDF bins. ' +
+          'A flat histogram is well-calibrated spread; a ∪ shape is over-confident, a ∩ under-confident.</figcaption>' +
+        '</figure></div>';
+
+      var rrows = c.questions.slice().reverse().map(function (q) {
+        var win = (q.crps_you != null && !isNaN(q.crps_you)) &&
+                  (q.crps_claude == null || isNaN(q.crps_claude) || q.crps_you <= q.crps_claude);
+        return '<tr><td class="mono id">' + esc(q.id) + '</td>' +
+          '<td>' + esc(q.text) + ' ' + tag(q.category) + '</td>' +
+          '<td class="mono dim">' + esc(q.units || '') + '</td>' +
+          '<td class="mono">' + fnum(q.outcome) + '</td>' +
+          '<td class="mono' + (win ? ' lead' : '') + '">' + fnum(q.crps_you) + '</td>' +
+          '<td class="mono">' + fnum(q.crps_claude) + '</td></tr>';
+      }).join('');
+      html += '<div class="panel" style="margin-top:1.1rem"><div class="eyebrow">Log · continuous</div>' +
+        '<table class="ledger"><thead><tr><th>ID</th><th>Question</th><th>Units</th><th>Outcome</th>' +
+          '<th style="color:' + YOU + '">Your CRPS</th><th style="color:' + MODEL + '">Claude CRPS</th></tr></thead>' +
+        '<tbody>' + rrows + '</tbody></table>' +
+        '<p class="dim" style="margin:.9rem 0 0">CRPS is in each question’s own units — lower is better. ' +
+        'Highlighted marks where you matched or beat the model.</p></div>';
+    } else {
+      html += '<p class="lede">No continuous question has resolved yet. The skill score (CRPSS), ' +
+        'mean CRPS, and the PIT calibration histogram appear here as each one lands. ' +
+        'The committed positions are below.</p>';
+    }
+
+    if (c.open && c.open.length) {
+      var orows = c.open.map(function (q) {
+        return '<tr><td class="mono id">' + esc(q.id) + '</td>' +
+          '<td>' + esc(q.text) + ' ' + tag(q.category) + '</td>' +
+          '<td class="mono" style="color:' + YOU + '">' + dist(q.you) + '</td>' +
+          '<td class="mono" style="color:' + MODEL + '">' + dist(q.claude) + '</td>' +
+          '<td class="mono dim">' + esc(q.units || '') + '</td>' +
+          '<td class="mono dim">' + fmtDate(q.resolves) + '</td></tr>';
+      }).join('');
+      html += '<div class="panel" style="margin-top:1.1rem"><div class="eyebrow">Open positions · continuous</div>' +
+        '<table class="ledger"><thead><tr><th>ID</th><th>Question</th>' +
+          '<th style="color:' + YOU + '">You</th><th style="color:' + MODEL + '">Claude</th>' +
+          '<th>Units</th><th>Resolves</th></tr></thead>' +
+        '<tbody>' + orows + '</tbody></table>' +
+        '<p class="dim" style="margin:.9rem 0 0">Each forecast is a predictive distribution, shown as ' +
+        '<span class="mono">μ ± σ</span>. Add <span class="mono">your</span> distribution in ' +
+        '<span class="mono">questions.yml</span> before each resolves.</p></div>';
+    }
+
+    return html + '</section>';
+  }
+
   // ---- footer ---------------------------------------------------------------
   function footer(d) {
     return '<footer><hr class="rule"/>' +
@@ -295,6 +423,7 @@
       positions(d) +
       awaiting(d) +
       log(d) +
+      continuousSection(d) +
       footer(d);
   }
 
