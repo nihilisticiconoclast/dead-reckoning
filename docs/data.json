@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-28T08:48:35Z",
+  "generated_at": "2026-06-29T11:19:04Z",
   "counts": {
     "resolved": 0,
     "open": 19,
@@ -44,7 +44,7 @@
       "text": "I complete at least one parkrun (5k) during July 2026",
       "category": "personal",
       "resolves": "2026-07-31",
-      "you": null,
+      "you": 0.95,
       "claude": 0.6
     },
     {
@@ -52,7 +52,7 @@
       "text": "The US Federal Reserve lowers the federal funds target range at its September 2026 FOMC meeting",
       "category": "macro",
       "resolves": "2026-09-16",
-      "you": null,
+      "you": 0.35,
       "claude": 0.45
     },
     {
@@ -60,7 +60,7 @@
       "text": "UK headline CPI inflation (YoY) for August 2026 prints at or below 2.5%",
       "category": "macro",
       "resolves": "2026-09-16",
-      "you": null,
+      "you": 0.51,
       "claude": 0.45
     },
     {
@@ -68,7 +68,7 @@
       "text": "The Bank of England cuts Bank Rate at its September 2026 MPC meeting",
       "category": "macro",
       "resolves": "2026-09-17",
-      "you": null,
+      "you": 0.32,
       "claude": 0.42
     },
     {
@@ -76,7 +76,7 @@
       "text": "GBP/USD closes above 1.32 on 30 Sep 2026",
       "category": "fx",
       "resolves": "2026-09-30",
-      "you": null,
+      "you": 0.36,
       "claude": 0.4
     },
     {
@@ -84,7 +84,7 @@
       "text": "FTSE 100 closes above 9,200 on 30 Sep 2026",
       "category": "equities",
       "resolves": "2026-09-30",
-      "you": null,
+      "you": 0.25,
       "claude": 0.38
     },
     {
@@ -92,7 +92,7 @@
       "text": "The S&P 500 sets a new intraday all-time high at some point in Q3 2026",
       "category": "equities",
       "resolves": "2026-09-30",
-      "you": null,
+      "you": 0.55,
       "claude": 0.6
     },
     {
@@ -100,7 +100,7 @@
       "text": "I read at least three books for leisure between July and September 2026",
       "category": "personal",
       "resolves": "2026-09-30",
-      "you": null,
+      "you": 0.15,
       "claude": 0.55
     },
     {
@@ -108,7 +108,7 @@
       "text": "I commit to a personal GitHub repo on at least 20 distinct days in Q3 2026",
       "category": "personal",
       "resolves": "2026-09-30",
-      "you": null,
+      "you": 0.85,
       "claude": 0.6
     },
     {
@@ -116,7 +116,7 @@
       "text": "I take at least one overnight trip away from home before 30 September 2026",
       "category": "personal",
       "resolves": "2026-09-30",
-      "you": null,
+      "you": 0.99,
       "claude": 0.82
     },
     {
@@ -124,7 +124,7 @@
       "text": "Liverpool are top of the Premier League table on 1 November 2026",
       "category": "football",
       "resolves": "2026-11-01",
-      "you": null,
+      "you": 0.15,
       "claude": 0.25
     },
     {
@@ -132,7 +132,7 @@
       "text": "EUR/USD closes above 1.16 on 31 Dec 2026",
       "category": "fx",
       "resolves": "2026-12-31",
-      "you": null,
+      "you": 0.23,
       "claude": 0.4
     },
     {
@@ -140,7 +140,7 @@
       "text": "USD/JPY trades above 150 at any point in the second half of 2026",
       "category": "fx",
       "resolves": "2026-12-31",
-      "you": null,
+      "you": 0.55,
       "claude": 0.8
     },
     {
@@ -148,7 +148,7 @@
       "text": "The S&P 500 ends 2026 above its 2025 year-end closing level",
       "category": "equities",
       "resolves": "2026-12-31",
-      "you": null,
+      "you": 0.77,
       "claude": 0.66
     },
     {
@@ -156,7 +156,7 @@
       "text": "US headline CPI inflation (YoY) falls below 2.0% in at least one monthly print during H2 2026",
       "category": "macro",
       "resolves": "2026-12-31",
-      "you": null,
+      "you": 0.45,
       "claude": 0.28
     },
     {
@@ -164,7 +164,7 @@
       "text": "The dead-reckoning repo has at least 5 GitHub stars by 31 Dec 2026",
       "category": "meta",
       "resolves": "2026-12-31",
-      "you": null,
+      "you": 0.01,
       "claude": 0.3
     },
     {
@@ -172,7 +172,7 @@
       "text": "This log contains at least 20 resolved forecasts by 31 Dec 2026",
       "category": "meta",
       "resolves": "2026-12-31",
-      "you": null,
+      "you": 0.68,
       "claude": 0.35
     },
     {
@@ -180,7 +180,7 @@
       "text": "Real Madrid reach the quarter-finals of the 2026/27 UEFA Champions League",
       "category": "football",
       "resolves": "2027-04-09",
-      "you": null,
+      "you": 0.65,
       "claude": 0.64
     },
     {
@@ -188,7 +188,7 @@
       "text": "Manchester City finish in the top four of the 2026/27 Premier League",
       "category": "football",
       "resolves": "2027-05-30",
-      "you": null,
+      "you": 0.82,
       "claude": 0.74
     }
   ],

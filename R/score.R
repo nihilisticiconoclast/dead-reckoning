@@ -74,7 +74,7 @@ openq    <- ord(openq)
 # ---- score one forecaster ----------------------------------------------------
 score_one <- function(rs, key) {
   p <- vapply(rs, function(r) r[[key]], 0)
-  y <- vapply(rs, function(r) r$outcome, 0L)
+  y <- vapply(rs, function(r) r$outcome, 0)
   n <- length(y)
   obar <- mean(y)
   brier <- mean((p - y)^2)
@@ -145,4 +145,42 @@ out <- list(
   generated_at = format(as.POSIXlt(Sys.time(), tz = "UTC"), "%Y-%m-%dT%H:%M:%SZ"),
   counts = list(resolved = length(resolved), open = length(openq),
                 awaiting = length(awaiting)),
-  base_rate = rou
+  base_rate = round4(if (length(resolved)) mean(vapply(resolved, function(r) r$outcome, 0)) else NA),
+  forecasters = forecasters,
+  calibration = calibration,
+  timeseries = timeseries,
+  resolved = resolved_out,
+  open = open_out,
+  awaiting = awaiting_out
+)
+
+# ---- continuous (CRPS) sibling -----------------------------------------------
+# Additive: score any `type: continuous` questions and merge them under
+# out$continuous. score_continuous() returns NULL for the all-binary ledger, so
+# the binary output and the dashboard stay untouched. Wrapped so a fault in the
+# continuous path can never break the nightly binary run.
+cont_block <- tryCatch({
+  source("R/score_continuous.R")
+  score_continuous(rows, FORECASTERS, TODAY)
+}, error = function(e) {
+  message("continuous scoring skipped: ", conditionMessage(e)); NULL
+})
+if (!is.null(cont_block)) out$continuous <- cont_block
+
+# ---- write -------------------------------------------------------------------
+# DR_OUT lets a local run target a throwaway file (see CLAUDE.md); the Action
+# leaves it unset and writes the real docs/data.json.
+DR_OUT  <- Sys.getenv("DR_OUT", "docs/data.json")
+out_dir <- dirname(DR_OUT)
+if (nzchar(out_dir) && !dir.exists(out_dir)) dir.create(out_dir, recursive = TRUE)
+writeLines(
+  jsonlite::toJSON(out, auto_unbox = TRUE, pretty = TRUE, null = "null", na = "null"),
+  DR_OUT
+)
+cat(sprintf("Scored %d resolved | %d open | %d awaiting\n",
+            length(resolved), length(openq), length(awaiting)))
+for (k in FORECASTERS) {
+  f <- forecasters[[k]]
+  cat(sprintf("  %-6s Brier=%.4f  logloss=%.4f  BSS=%.4f  rel=%.4f  res=%.4f\n",
+              f$label, f$brier, f$logloss, f$bss, f$reliability, f$resolution))
+}
