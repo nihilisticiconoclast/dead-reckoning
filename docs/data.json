@@ -1,8 +1,8 @@
 {
-  "generated_at": "2026-06-29T12:02:02Z",
+  "generated_at": "2026-06-30T04:36:58Z",
   "counts": {
     "resolved": 0,
-    "open": 19,
+    "open": 34,
     "awaiting": 0
   },
   "base_rate": null,
@@ -120,12 +120,36 @@
       "claude": 0.82
     },
     {
+      "id": "q-038",
+      "text": "Novak Djokovic wins the 2026 Wimbledon or US Open men's singles title",
+      "category": "sport",
+      "resolves": "2026-09-30",
+      "you": null,
+      "claude": 0.18
+    },
+    {
       "id": "q-011",
       "text": "Liverpool are top of the Premier League table on 1 November 2026",
       "category": "football",
       "resolves": "2026-11-01",
       "you": 0.15,
       "claude": 0.25
+    },
+    {
+      "id": "q-040",
+      "text": "A 2026 Nobel Prize (any category) cites AI / machine learning as central to the awarded work",
+      "category": "science",
+      "resolves": "2026-11-30",
+      "you": null,
+      "claude": 0.17
+    },
+    {
+      "id": "q-039",
+      "text": "Max Verstappen wins the 2026 F1 World Drivers' Championship",
+      "category": "sport",
+      "resolves": "2026-12-15",
+      "you": null,
+      "claude": 0.33
     },
     {
       "id": "q-002",
@@ -176,6 +200,94 @@
       "claude": 0.35
     },
     {
+      "id": "q-030",
+      "text": "SpaceX Starship completes an orbital-velocity flight with a controlled reentry in 2026",
+      "category": "space",
+      "resolves": "2026-12-31",
+      "you": null,
+      "claude": 0.78
+    },
+    {
+      "id": "q-032",
+      "text": "SpaceX catches a returning Starship upper stage with the launch tower at least once in 2026",
+      "category": "space",
+      "resolves": "2026-12-31",
+      "you": null,
+      "claude": 0.4
+    },
+    {
+      "id": "q-033",
+      "text": "Apple officially announces a foldable iPhone during 2026",
+      "category": "tech",
+      "resolves": "2026-12-31",
+      "you": null,
+      "claude": 0.2
+    },
+    {
+      "id": "q-034",
+      "text": "A major AI lab publicly labels a released model as 'AGI' / 'artificial general intelligence' in 2026",
+      "category": "tech",
+      "resolves": "2026-12-31",
+      "you": null,
+      "claude": 0.07
+    },
+    {
+      "id": "q-037",
+      "text": "Grand Theft Auto VI is released (available to purchase) before 31 December 2026",
+      "category": "games",
+      "resolves": "2026-12-31",
+      "you": null,
+      "claude": 0.45
+    },
+    {
+      "id": "q-041",
+      "text": "A newly discovered interstellar object is announced between 1 July and 31 December 2026",
+      "category": "space",
+      "resolves": "2026-12-31",
+      "you": null,
+      "claude": 0.38
+    },
+    {
+      "id": "q-043",
+      "text": "Taylor Swift announces or releases a new studio album between 1 July and 31 December 2026",
+      "category": "music",
+      "resolves": "2026-12-31",
+      "you": null,
+      "claude": 0.45
+    },
+    {
+      "id": "q-035",
+      "text": "The worldwide #1 highest-grossing film of 2026 is a sequel, franchise entry, or remake (not original IP)",
+      "category": "film",
+      "resolves": "2027-01-31",
+      "you": null,
+      "claude": 0.85
+    },
+    {
+      "id": "q-044",
+      "text": "A new official men's marathon world record is ratified for a race run in 2026",
+      "category": "sport",
+      "resolves": "2027-01-31",
+      "you": null,
+      "claude": 0.3
+    },
+    {
+      "id": "q-042",
+      "text": "2026 is ranked among the three warmest years on record by NASA or NOAA",
+      "category": "climate",
+      "resolves": "2027-02-15",
+      "you": null,
+      "claude": 0.85
+    },
+    {
+      "id": "q-036",
+      "text": "At least one 2026-released film grosses $2.0bn or more worldwide",
+      "category": "film",
+      "resolves": "2027-02-28",
+      "you": null,
+      "claude": 0.28
+    },
+    {
       "id": "q-013",
       "text": "Real Madrid reach the quarter-finals of the 2026/27 UEFA Champions League",
       "category": "football",
@@ -190,6 +302,14 @@
       "resolves": "2027-05-30",
       "you": 0.82,
       "claude": 0.74
+    },
+    {
+      "id": "q-031",
+      "text": "NASA's Artemis II crewed lunar flyby launches before 30 June 2027",
+      "category": "space",
+      "resolves": "2027-06-30",
+      "you": null,
+      "claude": 0.55
     }
   ],
   "awaiting": [],
@@ -248,6 +368,18 @@
         }
       },
       {
+        "id": "q-049",
+        "text": "Number of named storms in the 2026 Atlantic hurricane season",
+        "category": "weather",
+        "units": "named storms",
+        "resolves": "2026-11-30",
+        "you": null,
+        "claude": {
+          "mu": 16,
+          "sigma": 4
+        }
+      },
+      {
         "id": "q-026",
         "text": "Bank of England Bank Rate after the December 2026 MPC meeting, in percent",
         "category": "macro",
@@ -296,6 +428,18 @@
         }
       },
       {
+        "id": "q-048",
+        "text": "Bitcoin price (BTC/USD) on 31 December 2026",
+        "category": "crypto",
+        "units": "USD",
+        "resolves": "2026-12-31",
+        "you": null,
+        "claude": {
+          "mu": 110000,
+          "sigma": 45000
+        }
+      },
+      {
         "id": "q-025",
         "text": "US headline CPI inflation (YoY) for the December 2026 print, in percent",
         "category": "macro",
@@ -305,6 +449,42 @@
         "claude": {
           "mu": 2.5,
           "sigma": 0.5
+        }
+      },
+      {
+        "id": "q-045",
+        "text": "Number of SpaceX orbital-class launches in calendar year 2026",
+        "category": "space",
+        "units": "launches",
+        "resolves": "2027-01-15",
+        "you": null,
+        "claude": {
+          "mu": 165,
+          "sigma": 25
+        }
+      },
+      {
+        "id": "q-046",
+        "text": "2026 global mean surface temperature anomaly above the 1850–1900 baseline, in °C",
+        "category": "climate",
+        "units": "°C",
+        "resolves": "2027-01-31",
+        "you": null,
+        "claude": {
+          "mu": 1.45,
+          "sigma": 0.12
+        }
+      },
+      {
+        "id": "q-047",
+        "text": "Worldwide box-office gross of the #1 highest-grossing film of 2026, in US$ billions",
+        "category": "film",
+        "units": "$ billion",
+        "resolves": "2027-01-31",
+        "you": null,
+        "claude": {
+          "mu": 1.5,
+          "sigma": 0.4
         }
       },
       {

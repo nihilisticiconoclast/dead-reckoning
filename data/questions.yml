@@ -327,3 +327,194 @@ questions:
     forecasts:
       you:
       claude: { mu: 18, sigma: 5 }
+
+  # ===== more predictions — fun / varied (claude = my best estimate) ==========
+  # Beyond markets & football: space, tech, film, games, sport, science,
+  # climate, music, crypto, weather. `you:` left empty for you to fill.
+
+  # ---- binary ----------------------------------------------------------------
+  - id: q-030
+    text: "SpaceX Starship completes an orbital-velocity flight with a controlled reentry in 2026"
+    category: space
+    created: 2026-06-30
+    resolves: 2026-12-31
+    resolution: { type: manual, note: "SpaceX / FAA flight records" }
+    forecasts: { you: , claude: 0.78 }
+
+  - id: q-031
+    text: "NASA's Artemis II crewed lunar flyby launches before 30 June 2027"
+    category: space
+    created: 2026-06-30
+    resolves: 2027-06-30
+    resolution: { type: manual, note: "NASA launch record" }
+    forecasts: { you: , claude: 0.55 }
+
+  - id: q-032
+    text: "SpaceX catches a returning Starship upper stage with the launch tower at least once in 2026"
+    category: space
+    created: 2026-06-30
+    resolves: 2026-12-31
+    resolution: { type: manual, note: "SpaceX flight records; 'chopsticks' catch of the Ship, not the booster" }
+    forecasts: { you: , claude: 0.40 }
+
+  - id: q-033
+    text: "Apple officially announces a foldable iPhone during 2026"
+    category: tech
+    created: 2026-06-30
+    resolves: 2026-12-31
+    resolution: { type: manual, note: "Apple official announcement" }
+    forecasts: { you: , claude: 0.20 }
+
+  - id: q-034
+    text: "A major AI lab publicly labels a released model as 'AGI' / 'artificial general intelligence' in 2026"
+    category: tech
+    created: 2026-06-30
+    resolves: 2026-12-31
+    resolution: { type: manual, note: "Public statement by OpenAI, Google DeepMind, Anthropic, Meta, or xAI" }
+    forecasts: { you: , claude: 0.07 }
+
+  - id: q-035
+    text: "The worldwide #1 highest-grossing film of 2026 is a sequel, franchise entry, or remake (not original IP)"
+    category: film
+    created: 2026-06-30
+    resolves: 2027-01-31
+    resolution: { type: manual, note: "Box Office Mojo worldwide 2026 chart" }
+    forecasts: { you: , claude: 0.85 }
+
+  - id: q-036
+    text: "At least one 2026-released film grosses $2.0bn or more worldwide"
+    category: film
+    created: 2026-06-30
+    resolves: 2027-02-28
+    resolution: { type: manual, note: "Box Office Mojo worldwide gross, lifetime" }
+    forecasts: { you: , claude: 0.28 }
+
+  - id: q-037
+    text: "Grand Theft Auto VI is released (available to purchase) before 31 December 2026"
+    category: games
+    created: 2026-06-30
+    resolves: 2026-12-31
+    resolution: { type: manual, note: "Available for purchase on any platform" }
+    forecasts: { you: , claude: 0.45 }
+
+  - id: q-038
+    text: "Novak Djokovic wins the 2026 Wimbledon or US Open men's singles title"
+    category: sport
+    created: 2026-06-30
+    resolves: 2026-09-30
+    resolution: { type: manual, note: "Tournament champion, either event" }
+    forecasts: { you: , claude: 0.18 }
+
+  - id: q-039
+    text: "Max Verstappen wins the 2026 F1 World Drivers' Championship"
+    category: sport
+    created: 2026-06-30
+    resolves: 2026-12-15
+    resolution: { type: manual, note: "FIA final 2026 standings (new-regulation season)" }
+    forecasts: { you: , claude: 0.33 }
+
+  - id: q-040
+    text: "A 2026 Nobel Prize (any category) cites AI / machine learning as central to the awarded work"
+    category: science
+    created: 2026-06-30
+    resolves: 2026-11-30
+    resolution: { type: manual, note: "Nobel Prize 2026 citations" }
+    forecasts: { you: , claude: 0.17 }
+
+  - id: q-041
+    text: "A newly discovered interstellar object is announced between 1 July and 31 December 2026"
+    category: space
+    created: 2026-06-30
+    resolves: 2026-12-31
+    resolution: { type: manual, note: "Minor Planet Center / IAU; Vera Rubin survey era raises the base rate" }
+    forecasts: { you: , claude: 0.38 }
+
+  - id: q-042
+    text: "2026 is ranked among the three warmest years on record by NASA or NOAA"
+    category: climate
+    created: 2026-06-30
+    resolves: 2027-02-15
+    resolution: { type: manual, note: "NASA GISS / NOAA annual statement, reported early 2027" }
+    forecasts: { you: , claude: 0.85 }
+
+  - id: q-043
+    text: "Taylor Swift announces or releases a new studio album between 1 July and 31 December 2026"
+    category: music
+    created: 2026-06-30
+    resolves: 2026-12-31
+    resolution: { type: manual, note: "Official announcement or release" }
+    forecasts: { you: , claude: 0.45 }
+
+  - id: q-044
+    text: "A new official men's marathon world record is ratified for a race run in 2026"
+    category: sport
+    created: 2026-06-30
+    resolves: 2027-01-31
+    resolution: { type: manual, note: "World Athletics ratified men's marathon world record" }
+    forecasts: { you: , claude: 0.30 }
+
+  # ---- continuous (CRPS) -----------------------------------------------------
+  - id: q-045
+    text: "Number of SpaceX orbital-class launches in calendar year 2026"
+    category: space
+    type: continuous
+    units: "launches"
+    created: 2026-06-30
+    resolves: 2027-01-15
+    resolution: { type: manual, note: "Count of SpaceX orbital-class launches, Jan–Dec 2026" }
+    reference: { mu: 130, sigma: 45 }
+    forecasts:
+      you:
+      claude: { mu: 165, sigma: 25 }
+
+  - id: q-046
+    text: "2026 global mean surface temperature anomaly above the 1850–1900 baseline, in °C"
+    category: climate
+    type: continuous
+    units: "°C"
+    created: 2026-06-30
+    resolves: 2027-01-31
+    resolution: { type: manual, note: "Copernicus/ERA5 or NASA GISS 2026 annual anomaly" }
+    reference: { mu: 1.40, sigma: 0.20 }
+    forecasts:
+      you:
+      claude: { mu: 1.45, sigma: 0.12 }
+
+  - id: q-047
+    text: "Worldwide box-office gross of the #1 highest-grossing film of 2026, in US$ billions"
+    category: film
+    type: continuous
+    units: "$ billion"
+    created: 2026-06-30
+    resolves: 2027-01-31
+    resolution: { type: manual, note: "Box Office Mojo worldwide gross of the 2026 #1 film" }
+    reference: { mu: 1.40, sigma: 0.50 }
+    forecasts:
+      you:
+      claude: { mu: 1.50, sigma: 0.40 }
+
+  - id: q-048
+    text: "Bitcoin price (BTC/USD) on 31 December 2026"
+    category: crypto
+    type: continuous
+    units: "USD"
+    created: 2026-06-30
+    resolves: 2026-12-31
+    resolution: { type: manual, note: "BTC/USD close, 31 Dec 2026 (CoinGecko)" }
+    reference: { mu: 95000, sigma: 50000 }
+    forecasts:
+      you:
+      claude: { mu: 110000, sigma: 45000 }
+
+  - id: q-049
+    text: "Number of named storms in the 2026 Atlantic hurricane season"
+    category: weather
+    type: continuous
+    units: "named storms"
+    created: 2026-06-30
+    resolves: 2026-11-30
+    resolution: { type: manual, note: "NOAA / NHC count of named Atlantic storms, 2026 season" }
+    reference: { mu: 14, sigma: 4 }
+    forecasts:
+      you:
+      claude: { mu: 16, sigma: 4 }
