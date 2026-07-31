@@ -1,9 +1,9 @@
 {
-  "generated_at": "2026-07-30T08:21:16Z",
+  "generated_at": "2026-07-31T08:45:34Z",
   "counts": {
     "resolved": 0,
-    "open": 34,
-    "awaiting": 0
+    "open": 33,
+    "awaiting": 1
   },
   "base_rate": null,
   "forecasters": {
@@ -39,14 +39,6 @@
   },
   "resolved": [],
   "open": [
-    {
-      "id": "q-016",
-      "text": "I complete at least one parkrun (5k) during July 2026",
-      "category": "personal",
-      "resolves": "2026-07-31",
-      "you": 0.95,
-      "claude": 0.6
-    },
     {
       "id": "q-008",
       "text": "The US Federal Reserve lowers the federal funds target range at its September 2026 FOMC meeting",
@@ -312,7 +304,17 @@
       "claude": 0.55
     }
   ],
-  "awaiting": [],
+  "awaiting": [
+    {
+      "id": "q-016",
+      "text": "I complete at least one parkrun (5k) during July 2026",
+      "category": "personal",
+      "resolves": "2026-07-31",
+      "you": 0.95,
+      "claude": 0.6,
+      "hint": "manual"
+    }
+  ],
   "continuous": {
     "n": 0,
     "forecasters": [],
