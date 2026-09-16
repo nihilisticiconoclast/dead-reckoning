@@ -1,9 +1,9 @@
 {
-  "generated_at": "2026-09-15T11:01:35Z",
+  "generated_at": "2026-09-16T10:49:28Z",
   "counts": {
     "resolved": 0,
-    "open": 33,
-    "awaiting": 1
+    "open": 31,
+    "awaiting": 3
   },
   "base_rate": null,
   "forecasters": {
@@ -39,22 +39,6 @@
   },
   "resolved": [],
   "open": [
-    {
-      "id": "q-008",
-      "text": "The US Federal Reserve lowers the federal funds target range at its September 2026 FOMC meeting",
-      "category": "macro",
-      "resolves": "2026-09-16",
-      "you": 0.35,
-      "claude": 0.45
-    },
-    {
-      "id": "q-009",
-      "text": "UK headline CPI inflation (YoY) for August 2026 prints at or below 2.5%",
-      "category": "macro",
-      "resolves": "2026-09-16",
-      "you": 0.51,
-      "claude": 0.45
-    },
     {
       "id": "q-007",
       "text": "The Bank of England cuts Bank Rate at its September 2026 MPC meeting",
@@ -305,6 +289,24 @@
     }
   ],
   "awaiting": [
+    {
+      "id": "q-008",
+      "text": "The US Federal Reserve lowers the federal funds target range at its September 2026 FOMC meeting",
+      "category": "macro",
+      "resolves": "2026-09-16",
+      "you": 0.35,
+      "claude": 0.45,
+      "hint": "manual"
+    },
+    {
+      "id": "q-009",
+      "text": "UK headline CPI inflation (YoY) for August 2026 prints at or below 2.5%",
+      "category": "macro",
+      "resolves": "2026-09-16",
+      "you": 0.51,
+      "claude": 0.45,
+      "hint": "manual"
+    },
     {
       "id": "q-016",
       "text": "I complete at least one parkrun (5k) during July 2026",
