@@ -1,9 +1,9 @@
 {
-  "generated_at": "2026-09-16T10:49:28Z",
+  "generated_at": "2026-09-17T10:56:26Z",
   "counts": {
     "resolved": 0,
-    "open": 31,
-    "awaiting": 3
+    "open": 30,
+    "awaiting": 4
   },
   "base_rate": null,
   "forecasters": {
@@ -39,14 +39,6 @@
   },
   "resolved": [],
   "open": [
-    {
-      "id": "q-007",
-      "text": "The Bank of England cuts Bank Rate at its September 2026 MPC meeting",
-      "category": "macro",
-      "resolves": "2026-09-17",
-      "you": 0.32,
-      "claude": 0.42
-    },
     {
       "id": "q-001",
       "text": "GBP/USD closes above 1.32 on 30 Sep 2026",
@@ -289,6 +281,15 @@
     }
   ],
   "awaiting": [
+    {
+      "id": "q-007",
+      "text": "The Bank of England cuts Bank Rate at its September 2026 MPC meeting",
+      "category": "macro",
+      "resolves": "2026-09-17",
+      "you": 0.32,
+      "claude": 0.42,
+      "hint": "manual"
+    },
     {
       "id": "q-008",
       "text": "The US Federal Reserve lowers the federal funds target range at its September 2026 FOMC meeting",
