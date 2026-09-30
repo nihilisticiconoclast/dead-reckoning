@@ -1,9 +1,9 @@
 {
-  "generated_at": "2026-09-29T12:05:43Z",
+  "generated_at": "2026-09-30T11:53:53Z",
   "counts": {
     "resolved": 0,
-    "open": 30,
-    "awaiting": 4
+    "open": 23,
+    "awaiting": 11
   },
   "base_rate": null,
   "forecasters": {
@@ -39,62 +39,6 @@
   },
   "resolved": [],
   "open": [
-    {
-      "id": "q-001",
-      "text": "GBP/USD closes above 1.32 on 30 Sep 2026",
-      "category": "fx",
-      "resolves": "2026-09-30",
-      "you": 0.36,
-      "claude": 0.4
-    },
-    {
-      "id": "q-004",
-      "text": "FTSE 100 closes above 9,200 on 30 Sep 2026",
-      "category": "equities",
-      "resolves": "2026-09-30",
-      "you": 0.25,
-      "claude": 0.38
-    },
-    {
-      "id": "q-006",
-      "text": "The S&P 500 sets a new intraday all-time high at some point in Q3 2026",
-      "category": "equities",
-      "resolves": "2026-09-30",
-      "you": 0.55,
-      "claude": 0.6
-    },
-    {
-      "id": "q-017",
-      "text": "I read at least three books for leisure between July and September 2026",
-      "category": "personal",
-      "resolves": "2026-09-30",
-      "you": 0.15,
-      "claude": 0.55
-    },
-    {
-      "id": "q-018",
-      "text": "I commit to a personal GitHub repo on at least 20 distinct days in Q3 2026",
-      "category": "personal",
-      "resolves": "2026-09-30",
-      "you": 0.85,
-      "claude": 0.6
-    },
-    {
-      "id": "q-019",
-      "text": "I take at least one overnight trip away from home before 30 September 2026",
-      "category": "personal",
-      "resolves": "2026-09-30",
-      "you": 0.99,
-      "claude": 0.82
-    },
-    {
-      "id": "q-038",
-      "text": "Novak Djokovic wins the 2026 Wimbledon or US Open men's singles title",
-      "category": "sport",
-      "resolves": "2026-09-30",
-      "you": null,
-      "claude": 0.18
-    },
     {
       "id": "q-011",
       "text": "Liverpool are top of the Premier League table on 1 November 2026",
@@ -282,6 +226,33 @@
   ],
   "awaiting": [
     {
+      "id": "q-001",
+      "text": "GBP/USD closes above 1.32 on 30 Sep 2026",
+      "category": "fx",
+      "resolves": "2026-09-30",
+      "you": 0.36,
+      "claude": 0.4,
+      "hint": "manual"
+    },
+    {
+      "id": "q-004",
+      "text": "FTSE 100 closes above 9,200 on 30 Sep 2026",
+      "category": "equities",
+      "resolves": "2026-09-30",
+      "you": 0.25,
+      "claude": 0.38,
+      "hint": "manual"
+    },
+    {
+      "id": "q-006",
+      "text": "The S&P 500 sets a new intraday all-time high at some point in Q3 2026",
+      "category": "equities",
+      "resolves": "2026-09-30",
+      "you": 0.55,
+      "claude": 0.6,
+      "hint": "manual"
+    },
+    {
       "id": "q-007",
       "text": "The Bank of England cuts Bank Rate at its September 2026 MPC meeting",
       "category": "macro",
@@ -315,6 +286,42 @@
       "resolves": "2026-07-31",
       "you": 0.95,
       "claude": 0.6,
+      "hint": "manual"
+    },
+    {
+      "id": "q-017",
+      "text": "I read at least three books for leisure between July and September 2026",
+      "category": "personal",
+      "resolves": "2026-09-30",
+      "you": 0.15,
+      "claude": 0.55,
+      "hint": "manual"
+    },
+    {
+      "id": "q-018",
+      "text": "I commit to a personal GitHub repo on at least 20 distinct days in Q3 2026",
+      "category": "personal",
+      "resolves": "2026-09-30",
+      "you": 0.85,
+      "claude": 0.6,
+      "hint": "manual"
+    },
+    {
+      "id": "q-019",
+      "text": "I take at least one overnight trip away from home before 30 September 2026",
+      "category": "personal",
+      "resolves": "2026-09-30",
+      "you": 0.99,
+      "claude": 0.82,
+      "hint": "manual"
+    },
+    {
+      "id": "q-038",
+      "text": "Novak Djokovic wins the 2026 Wimbledon or US Open men's singles title",
+      "category": "sport",
+      "resolves": "2026-09-30",
+      "you": null,
+      "claude": 0.18,
       "hint": "manual"
     }
   ],
