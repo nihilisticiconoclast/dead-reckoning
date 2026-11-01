@@ -1,9 +1,9 @@
 {
-  "generated_at": "2026-10-31T11:40:15Z",
+  "generated_at": "2026-11-01T12:39:29Z",
   "counts": {
     "resolved": 0,
-    "open": 23,
-    "awaiting": 11
+    "open": 22,
+    "awaiting": 12
   },
   "base_rate": null,
   "forecasters": {
@@ -39,14 +39,6 @@
   },
   "resolved": [],
   "open": [
-    {
-      "id": "q-011",
-      "text": "Liverpool are top of the Premier League table on 1 November 2026",
-      "category": "football",
-      "resolves": "2026-11-01",
-      "you": 0.15,
-      "claude": 0.25
-    },
     {
       "id": "q-040",
       "text": "A 2026 Nobel Prize (any category) cites AI / machine learning as central to the awarded work",
@@ -277,6 +269,15 @@
       "resolves": "2026-09-16",
       "you": 0.51,
       "claude": 0.45,
+      "hint": "manual"
+    },
+    {
+      "id": "q-011",
+      "text": "Liverpool are top of the Premier League table on 1 November 2026",
+      "category": "football",
+      "resolves": "2026-11-01",
+      "you": 0.15,
+      "claude": 0.25,
       "hint": "manual"
     },
     {
